@@ -1,0 +1,15 @@
+# Klasör bazlı engellemeler (Hem API hem Vite altındakileri yakalar)
+node_modules/
+dist/
+.env
+
+# İşletim sistemi ve editör çöpleri
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Log dosyaları
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

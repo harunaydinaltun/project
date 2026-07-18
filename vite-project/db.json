@@ -1,0 +1,92 @@
+{
+  "car_models": [
+    {
+      "id": 1,
+      "brand": "Ford",
+      "model_name": "Focus",
+      "year": 2020,
+      "fuel_type": "Diesel",
+      "gear_type": "Manual",
+      "body_type": "Sedan",
+      "doors": 4,
+      "min_age": 21
+    },
+    {
+      "id": 2,
+      "brand": "Hyundai",
+      "model_name": "Accent",
+      "year": 2018,
+      "fuel_type": "Hybrid",
+      "gear_type": "Auto",
+      "body_type": "Sedan",
+      "doors": 4,
+      "min_age": 18
+    },
+    {
+      "brand": "Toyota",
+      "model_name": "Corolla",
+      "year": 2020,
+      "fuel_type": "Benzin",
+      "gear_type": "Auto",
+      "body_type": "Sedan",
+      "doors": 4,
+      "min_age": 18,
+      "id": 3
+    },
+    {
+      "brand": "Ford",
+      "model_name": "Fiesta",
+      "year": 2021,
+      "fuel_type": "Diesel",
+      "gear_type": "Auto",
+      "body_type": "Sedan",
+      "doors": 4,
+      "min_age": 18,
+      "id": 4
+    }
+  ],
+  "cars": [
+    {
+      "id": 1,
+      "model_id": 1,
+      "license_plate": "60SF101",
+      "color": "Brown",
+      "daily_price": 1500,
+      "deposit": 3100,
+      "kilometer": 15000,
+      "location_id": 1,
+      "status": "AVAILABLE"
+    },
+    {
+      "model_id": 3,
+      "license_plate": "34HRN14",
+      "color": "Black",
+      "daily_price": 2000,
+      "deposit": 4000,
+      "kilometer": 15000,
+      "location_id": 4000,
+      "status": "AVAILABLE",
+      "id": 2
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "full_name": "Mehmet Yılmaz",
+      "email": "mehmetyilmaz@gmail.com",
+      "birth_date": "01-01-1999",
+      "role": "user"
+    }
+  ],
+  "rentals": [
+    {
+      "id": 1,
+      "car_id": 1,
+      "user_id": 1,
+      "stard_date": "14-07-2026",
+      "end_date": "23-07-2026",
+      "total_price": 15000,
+      "status": "active"
+    }
+  ]
+}
