@@ -3,6 +3,6 @@ import { getAvailableCars } from "../controllers/car.js";
 
 const router = express.Router();
 
-router.post("/search", getAvailableCars);
+router.post("/available", getAvailableCars);
 
 export default router;
