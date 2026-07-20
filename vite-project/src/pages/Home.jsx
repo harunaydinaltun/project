@@ -1,18 +1,37 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from "axios";
 
 export const Home = ({ t }) => {
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
+
     if (!startDate || !endDate) {
       alert("Lütfen tarihleri girin");
       return;
     }
-    navigate("/results", { state: { startDate, endDate } });
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8800/api/cars/search",
+        {
+          startDate,
+          endDate,
+        },
+      );
+
+      // Gelen sonuçları (Müsait arabaları) Results sayfasına yönlendirirken state olarak aktarıyoruz
+      navigate("/results", {
+        state: { cars: response.data.data, startDate, endDate },
+      });
+    } catch (error) {
+      console.error("Arama yapılırken hata oluştu:", error);
+      alert("Araçlar listelenirken bir hata meydana geldi.");
+    }
   };
 
   return (
