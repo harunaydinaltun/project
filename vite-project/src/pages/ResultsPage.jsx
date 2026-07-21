@@ -1,69 +1,61 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { CarCard } from "../components/CarCard";
 import axios from "axios";
+import SearchSideBar from "../components/SearchSideBar";
 
-const ResultsPage = () => {
+const ResultsPage = ({ t }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Home.jsx'ten gönderilen verileri güvenle teslim al
-  const { startDate, endDate } = location.state || {};
+  const { startDate, endDate, totalDays } = location.state || {};
 
   const [cars, setCars] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  const [filters, setFilters] = useState({
+    brand: null,
+    modelName: null,
+    color: null,
+    locationId: null,
+  });
+
+  const handleFilterChange = (filterKey, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterKey]: prev[filterKey] === value ? null : value,
+    }));
+  };
+
+  console.log("backende gelen araç verisi", cars);
 
   useEffect(() => {
-    // Eğer birisi URL'ye direkt /results yazıp girdiyse, Home'a geri şutla
-    if (!startDate || !endDate) {
-      navigate("/");
-      return;
-    }
+    const queryParams = new URLSearchParams();
 
-    // Node.js Controller'ına (car.js) GET isteği at
-    // startDate ve endDate'i URL query parametresi olarak ekliyoruz
+    if (startDate) queryParams.append("startDate", startDate);
+    if (endDate) queryParams.append("endDate", endDate);
+
+    Object.keys(filters).forEach((key) => {
+      if (filters[key]) {
+        queryParams.append(key, filters[key]);
+      }
+    });
+
     axios
-      .get(
-        `http://localhost:8800/api/cars/available?start_date=${startDate}&end_date=${endDate}`,
-      )
-      .then((res) => {
-        setCars(res.data); // Controller'ın döndüğü 'availableCars' JSON'u
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Veri çekilemedi:", err);
-        setLoading(false);
-      });
-  }, [startDate, endDate, navigate]);
-
-  // Yükleme ekranı
-  if (loading) return <h2>Uygun araçlar MySQL'den çekiliyor...</h2>;
+      .get(`http://localhost:8800/api/cars/available?${queryParams.toString()}`)
+      .then((res) => setCars(res.data))
+      .catch((err) => console.error(err));
+  }, [startDate, endDate, filters]);
 
   return (
-    <div style={{ padding: "50px" }}>
-      <h2>
-        Seçilen Tarihler: {startDate} ile {endDate} Arası
-      </h2>
-
-      {cars.length === 0 ? (
-        <p>Bu tarihlerde uygun araç maalesef yok.</p>
-      ) : (
-        <div style={{ display: "grid", gap: "20px" }}>
-          {cars.map((car) => (
-            <div
-              key={car.id}
-              style={{ border: "1px solid #ccc", padding: "15px" }}
-            >
-              <h3>
-                {car.brand} {car.model}
-              </h3>
-              <p>Günlük Fiyat: {car.daily_price} TL</p>
-              <button onClick={() => navigate(`/checkout/${car.id}`)}>
-                Kirala
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+    <div>
+      <SearchSideBar
+        t={t}
+        filters={filters}
+        onFilterChange={handleFilterChange}
+      ></SearchSideBar>
+      {cars.map((car) => (
+        <CarCard key={car.id} car={car} t={t} totalDays={totalDays}></CarCard>
+      ))}
     </div>
   );
 };

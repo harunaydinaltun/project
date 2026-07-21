@@ -20,8 +20,21 @@ export const Home = ({ t }) => {
       return;
     }
 
-    navigate("/results", { state: { startDate, endDate } });
+    navigate("/results", { state: { startDate, endDate, totalDays } });
   };
+
+  const calculateTotalDays = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffInTime = end.getTime() - start.getTime();
+    const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
+
+    if (diffInDays < 0) return 0;
+
+    return diffInDays;
+  };
+
+  const totalDays = calculateTotalDays(startDate, endDate);
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-4">
       <div className="flex flex-col md:flex-row w-full max-w-sm md:max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">

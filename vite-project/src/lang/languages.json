@@ -41,7 +41,22 @@
     "carModel": "Araba Modeli",
     "carList": "Araba Listesi",
     "carModelList": "Model Listesi",
-    "edit": "Düzenle"
+    "edit": "Düzenle",
+    "colorConstants": {
+      "White": "Beyaz",
+      "Black": "Siyah",
+      "Gray": "Gri",
+      "Silver": "Gümüş",
+      "Blue": "Mavi",
+      "Red": "Kırmızı",
+      "Green": "Yeşil",
+      "Brown": "Kahverengi",
+      "Beige": "Bej",
+      "Yellow": "Sarı",
+      "Orange": "Turuncu",
+      "Purple": "Mor",
+      "Pink": "Pembe"
+    }
   },
   "en": {
     "ID": "ID",
@@ -85,6 +100,21 @@
     "carModel": "Car Model",
     "carList": "Car List",
     "carModelList": "Model List",
-    "edit": "Edit"
+    "edit": "Edit",
+    "colorConstants": {
+      "White": "White",
+      "Black": "Black",
+      "Gray": "Gray",
+      "Silver": "Silver",
+      "Blue": "Blue",
+      "Red": "Red",
+      "Green": "Green",
+      "Brown": "Brown",
+      "Beige": "Beige",
+      "Yellow": "Yellow",
+      "Orange": "Orange",
+      "Purple": "Purple",
+      "Pink": "Pink"
+    }
   }
 }
