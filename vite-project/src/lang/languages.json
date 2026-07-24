@@ -42,6 +42,8 @@
     "carList": "Araba Listesi",
     "carModelList": "Model Listesi",
     "edit": "Düzenle",
+    "register": "Kayıt Ol",
+    "viewDetails": "Detayları İncele",
     "colorConstants": {
       "White": "Beyaz",
       "Black": "Siyah",
@@ -56,7 +58,32 @@
       "Orange": "Turuncu",
       "Purple": "Mor",
       "Pink": "Pembe"
-    }
+    },
+    "noOptions": "Seçenek Yok",
+    "nextPage": "Sonraki Sayfa",
+    "previousPage": "Önceki Sayfa",
+    "gearConstants": {
+      "Automatic": "Otomatik",
+      "Manual": "Manuel"
+    },
+    "fuelConstants": {
+      "Diesel": "Dizel",
+      "Gasoline": "Benzin",
+      "LPG": "LPG",
+      "Electric": "Elektrikli",
+      "Hybrid": "Hibrit"
+    },
+    "login": "Giriş Yap",
+    "name": "İsim",
+    "surname": "Soyisim",
+    "yourBirthdate": "Doğum tarihiniz",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmYourPassword": "Şifrenizi onaylayın",
+    "dontHaveAccount": "Bir hesabınız yok mu?",
+    "registerPage": "Hesap oluşturun.",
+    "haveAccount": "Zaten bir hesabınız var mı?",
+    "loginPage": "Giriş yapın."
   },
   "en": {
     "ID": "ID",
@@ -101,6 +128,8 @@
     "carList": "Car List",
     "carModelList": "Model List",
     "edit": "Edit",
+    "register": "Register",
+    "viewDetails": "View Details",
     "colorConstants": {
       "White": "White",
       "Black": "Black",
@@ -115,6 +144,31 @@
       "Orange": "Orange",
       "Purple": "Purple",
       "Pink": "Pink"
-    }
+    },
+    "noOptions": "No Options",
+    "nextPage": "Next Page",
+    "previousPage": "Previous Page",
+    "gearConstants": {
+      "Automatic": "Automatic",
+      "Manual": "Manual"
+    },
+    "fuelConstants": {
+      "Diesel": "Dizel",
+      "Gasoline": "Benzin",
+      "LPG": "LPG",
+      "Electric": "Elektrikli",
+      "Hybrid": "Hibrit"
+    },
+    "login": "Login",
+    "name": "Name",
+    "surname": "Surname",
+    "yourBirthdate": "Your birthdate",
+    "email": "E-mail",
+    "password": "Password",
+    "confirmYourPassword": "Confirm your password",
+    "dontHaveAccount": "Don't you have an account? Go to",
+    "registerPage": "register page.",
+    "haveAccount": "Do you have already an account? Go to",
+    "loginPage": "login page."
   }
 }

@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import logo from "../assets/placeholders/logo_transparent.png";
+import { TR, GB } from "country-flag-icons/react/3x2";
 
 export const Home = ({ t }) => {
   const navigate = useNavigate();
@@ -36,15 +38,21 @@ export const Home = ({ t }) => {
 
   const totalDays = calculateTotalDays(startDate, endDate);
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-slate-100 to-slate-200 p-4">
+    <div className="min-h-screen w-full flex items-center justify-center  p-4">
       <div className="flex flex-col md:flex-row w-full max-w-sm md:max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div className="flex-1 bg-slate-50 flex items-center justify-center p-8 md:p-10 border-b md:border-b-0 md:border-r border-slate-200">
-          <p className="text-slate-800 text-lg leading-relaxed text-center">
-            LJNAFS CAKSAK SANCLAS ASLCNVAL CKLASCN nkvlasvlnk ALVNLAS Cnlnalksvn
-          </p>
+        <div className="flex-1 flex-col bg-slate-50 flex items-center justify-center p-8 md:p-10 border-b md:border-b-0 md:border-r border-slate-200">
+          <img
+            className="max-w-full h-auto object-cover"
+            src={logo}
+            alt="logo"
+          />
         </div>
 
         <div className="flex-1 flex flex-col justify-center p-8 md:p-10 gap-5">
+          <div className="w-11 flex self-end gap-x-1">
+            <TR></TR>
+            <GB></GB>
+          </div>
           <form onSubmit={handleSearch} className="flex flex-col gap-4">
             <h2 className="text-slate-800 text-2xl font-semibold mb-2">
               {t.searchCar || "Araç Ara"}
@@ -88,7 +96,7 @@ export const Home = ({ t }) => {
             onClick={() => navigate("/register")}
             className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium p-3 rounded-lg transition-all text-base -mt-1"
           >
-            Kayıt Ol
+            {t.register}
           </button>
         </div>
       </div>
