@@ -1,82 +1,137 @@
-import { useNavigate } from "react-router-dom";
 import logo from "../assets/placeholders/logo_transparent.png";
+import { useRegisterForm } from "../hooks/useRegisterForm";
+import { CustomInput } from "../components/CustomInput";
+import { PasswordConditions } from "../components/PasswordConditions";
 
 export const RegisterPage = ({ t }) => {
-  const today = new Date().toISOString().split("T")[0];
-  const navigate = useNavigate();
+  const {
+    inputs,
+    errors,
+    passwordConditions,
+    err,
+    today,
+    handleChange,
+    handleRegister,
+    navigate,
+  } = useRegisterForm(t);
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <div className="grid grid-cols-1 justify-center items-center bg-slate-50 rounded-2xl shadow-2xl gap-y-2 p-5">
-        <img className="max-w-60 place-self-center" src={logo} alt="" />
+    <div className="min-h-screen flex justify-center items-center mt-5">
+      <form
+        onSubmit={handleRegister}
+        className="grid grid-cols-1 w-full min-w-120 max-w-130 justify-center items-center bg-slate-50 rounded-2xl shadow-2xl gap-y-3 p-6"
+      >
+        <img
+          className="max-w-48 place-self-center mb-2"
+          src={logo}
+          alt="Logo"
+        />
 
-        <div className="flex justify-between gap-2">
-          <div className="flex flex-col">
-            <span className="text-xs text-slate-500 font-semibold">
-              {t.name}
-            </span>
-            <input
-              className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-              type="text"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <span className="text-xs text-slate-500 font-semibold">
-              {t.surname}
-            </span>
-            <input
-              className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-              type="text"
-            />
-          </div>
+        <div className="flex justify-between gap-3">
+          <CustomInput
+            label={t.name}
+            name="name"
+            value={inputs.name}
+            onChange={handleChange}
+            error={errors.name}
+            maxLength={45}
+          />
+          <CustomInput
+            label={t.surname}
+            name="surname"
+            value={inputs.surname}
+            onChange={handleChange}
+            error={errors.surname}
+            maxLength={45}
+          />
         </div>
 
-        <span className="text-xs text-slate-500 font-semibold">
-          {t.yourBirthdate}
-        </span>
-        <input
-          className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+        <CustomInput
+          label={t.yourBirthdate}
           type="date"
+          name="birthdate"
+          value={inputs.birthdate}
           max={today}
+          onChange={handleChange}
+          error={errors.birthdate}
         />
 
-        <span className="text-xs text-slate-500 font-semibold">{t.email}</span>
-        <input
-          className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+        <CustomInput
+          label={t.username}
+          name="username"
+          value={inputs.username}
+          onChange={handleChange}
+          error={errors.username}
+          maxLength={30}
+        />
+        <CustomInput
+          label={t.email}
           type="email"
-          name=""
-          id=""
+          name="email"
+          value={inputs.email}
+          onChange={handleChange}
+          error={errors.email}
+          maxLength={255}
         />
-        <span className="text-xs text-slate-500 font-semibold">
-          {t.password}
-        </span>
+        <CustomInput
+          label={t.telNo}
+          type="tel"
+          name="tel_no"
+          value={inputs.tel_no}
+          placeholder="05xx xxx xx xx"
+          onChange={handleChange}
+          error={errors.tel_no}
+        />
 
-        <input
-          className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+        <div className="flex flex-col">
+          <CustomInput
+            label={t.password}
+            type="password"
+            name="password"
+            value={inputs.password}
+            onChange={handleChange}
+            maxLength={64}
+          />
+          <PasswordConditions
+            conditions={passwordConditions}
+            errors={errors}
+            t={t}
+          />
+        </div>
+
+        <CustomInput
+          label={t.confirmYourPassword}
           type="password"
+          name="confirmPassword"
+          value={inputs.confirmPassword}
+          onChange={handleChange}
+          error={errors.confirmPassword}
+          maxLength={64}
         />
 
-        <span className="text-xs text-slate-500 font-semibold">
-          {t.confirmYourPassword}
-        </span>
-        <input
-          className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-          type="password"
-        />
-        <button className="place-self-center bg-blue-400 hover:bg-blue-500 hover:cursor-pointer text-shadow-sm rounded-sm max-w-30 p-2.5 transition-all duration-300 active:scale-[0.98] ">
+        <button
+          type="submit"
+          className="place-self-center bg-blue-500 text-slate-200 ring-1 ring-blue-400 shadow-xs hover:cursor-pointer text-shadow-sm rounded-sm w-1/2 mt-2 p-2.5 transition-all duration-75 hover:scale-[0.99]"
+        >
           {t.register}
         </button>
-        <div className="text-[11px]">
-          <span>{t.haveAccount} </span>
+
+        {err && (
+          <p className="text-sm text-red-600 text-center font-semibold">
+            {err}
+          </p>
+        )}
+
+        <div className="text-[11px] text-center mt-2">
+          <span className="text-slate-600">{t.haveAccount} </span>
           <span
-            className="text-blue-600 hover:cursor-pointer hover:underline"
+            className="text-blue-600 font-semibold hover:cursor-pointer hover:underline"
             onClick={() => navigate("/login")}
           >
             {t.loginPage}
           </span>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

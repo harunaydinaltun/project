@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import logo from "../assets/placeholders/logo_transparent.png";
 import { TR, GB } from "country-flag-icons/react/3x2";
 
-export const Home = ({ t }) => {
+export const Home = ({ t, setLang, lang }) => {
   const navigate = useNavigate();
+  const { currentUser } = useContext(AuthContext);
   const today = new Date().toISOString().split("T")[0];
 
   const [startDate, setStartDate] = useState("");
@@ -50,10 +52,27 @@ export const Home = ({ t }) => {
 
         <div className="flex-1 flex flex-col justify-center p-8 md:p-10 gap-5">
           <div className="w-11 flex self-end gap-x-1">
-            <TR></TR>
-            <GB></GB>
+            <TR
+              className={`hover:cursor-pointer ${lang === "tr" ? "" : "opacity-50"}`}
+              onClick={() => {
+                setLang("tr");
+              }}
+            ></TR>
+            <GB
+              className={`hover:cursor-pointer ${lang === "en" ? "" : "opacity-50"}`}
+              onClick={() => {
+                setLang("en");
+              }}
+            ></GB>
           </div>
           <form onSubmit={handleSearch} className="flex flex-col gap-4">
+            {currentUser ? (
+              <h3 className="text-xs font-semibold text-green-600">
+                {t.welcome}, {currentUser.username}
+              </h3>
+            ) : (
+              ""
+            )}
             <h2 className="text-slate-800 text-2xl font-semibold mb-2">
               {t.searchCar || "Araç Ara"}
             </h2>
@@ -86,18 +105,22 @@ export const Home = ({ t }) => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium p-3 rounded-lg transition-all text-base mt-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base mt-2"
             >
               {t.search || "Ara"}
             </button>
           </form>
 
-          <button
-            onClick={() => navigate("/register")}
-            className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium p-3 rounded-lg transition-all text-base -mt-1"
-          >
-            {t.register}
-          </button>
+          {!currentUser ? (
+            <button
+              onClick={() => navigate("/login")}
+              className="w-full bg-green-500 hover:bg-green-600 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base -mt-1"
+            >
+              {t.login}
+            </button>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </div>

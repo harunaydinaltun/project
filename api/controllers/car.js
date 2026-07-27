@@ -1,6 +1,6 @@
 import { db } from "../connect.js";
 
-export const getAvailableCars = (req, res) => {
+export const getAvailableCars = async (req, res) => {
   const {
     startDate,
     endDate,
@@ -85,15 +85,13 @@ export const getAvailableCars = (req, res) => {
     queryParams.push(minAge);
   }
 
-  // 5. Sorguyu Çalıştır
-  db.query(query, queryParams, (err, data) => {
-    if (err) {
-      console.error("SQL / Backend hatası:", err.sqlMessage || err);
-      return res
-        .status(500)
-        .json({ message: "Sunucu hatası", error: err.sqlMessage });
-    }
-
+  try {
+    const [data] = await db.query(query, queryParams);
     return res.status(200).json(data);
-  });
+  } catch (err) {
+    console.error("Backend error: ", err.sqlMessage || err);
+    return res
+      .status(500)
+      .json({ message: "Sunucu hatası", error: err.sqlMessage || err });
+  }
 };

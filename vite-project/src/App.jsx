@@ -3,11 +3,12 @@ import {
   Route,
   Routes,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import Home from "./pages/Home";
-import AdminPanelPage from "./pages/AdminPanelPage";
 import languages from "./lang/languages.json";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
 import ResultsPage from "./pages/ResultsPage";
 import DetailsPage from "./pages/DetailsPage";
 import AdminEditCarPage from "./pages/AdminEditCarPage";
@@ -16,6 +17,8 @@ import Test from "./pages/Test";
 import { Navbar } from "./components/Navbar";
 import { LoginPage } from "./pages/LoginPage";
 import ForgotYourPasswordPage from "./pages/ForgotYourPasswordPage";
+import { ProfilePage } from "./pages/ProfilePage";
+
 const getSystemLanguage = () => {
   const browserLang = navigator.language || navigator.userLanguage || "";
   const shortLang = browserLang.substring(0, 2).toLowerCase();
@@ -25,6 +28,7 @@ const getSystemLanguage = () => {
 
 export const AppContent = () => {
   const location = useLocation();
+  const { currentUser } = useContext(AuthContext);
 
   const [lang, setLang] = useState(() => {
     const savedLang = localStorage.getItem("app_language");
@@ -38,7 +42,7 @@ export const AppContent = () => {
   const t = languages[lang];
 
   return (
-    <div className="bg-linear-to-b from-mist-100 to-mist-300 ">
+    <div className="bg-linear-to-b from-mist-100 to-mist-300 min-h-screen ">
       {location.pathname !== "/" && (
         <Navbar t={t} setLang={setLang} lang={lang} />
       )}
@@ -48,14 +52,25 @@ export const AppContent = () => {
           element={<Home t={t} setLang={setLang} lang={lang} />}
         ></Route>
         <Route path="/test" element={<Test t={t} />}></Route>
-        <Route path="/adminpanel" element={<AdminPanelPage t={t} />}></Route>
+        <Route
+          path="/profile"
+          element={
+            currentUser ? <ProfilePage t={t} /> : <Navigate to="/login" />
+          }
+        ></Route>
         <Route path="/results" element={<ResultsPage t={t} />}></Route>
         <Route path="/details/:id" element={<DetailsPage t={t} />}></Route>
         <Route path="/edit/:id" element={<AdminEditCarPage t={t} />}></Route>
         <Route path="/details/" element={<DetailsPage t={t} />}></Route>
         <Route path="/edit/" element={<AdminEditCarPage t={t} />}></Route>
-        <Route path="/register/" element={<RegisterPage t={t} />}></Route>
-        <Route path="/login/" element={<LoginPage t={t} />}></Route>
+        <Route
+          path="/register/"
+          element={currentUser ? <Navigate to="/" /> : <RegisterPage t={t} />}
+        ></Route>
+        <Route
+          path="/login/"
+          element={currentUser ? <Navigate to="/" /> : <LoginPage t={t} />}
+        ></Route>
         <Route
           path="/psswrdrst/"
           element={<ForgotYourPasswordPage t={t} />}
