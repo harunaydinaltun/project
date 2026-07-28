@@ -7,7 +7,7 @@ export const BrandFilterBox = ({ t, brands = [], filters, onFilterChange }) => {
   return (
     <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg">
       <div className="flex justify-evenly" onClick={() => setIsOpen(!isOpen)}>
-        <div className="pl-1 text-shadow-md">{t.brand || "MARKA"}</div>
+        <div className="pl-1 text-shadow-md">{t.brand}</div>
         <span
           className={`text-shadow-md text-xs transform duration-500 ${
             isOpen ? "rotate-x-180" : ""
@@ -31,10 +31,9 @@ export const BrandFilterBox = ({ t, brands = [], filters, onFilterChange }) => {
                   <div
                     key={brand}
                     onClick={() => {
-                      // Marka değişirse seçili modeli sıfırlamak için handler'ı çağırıyoruz
                       onFilterChange("brand", brand);
                       if (filters?.modelName) {
-                        onFilterChange("modelName", null); // Yeni marka seçilince eski model seçimini temizle
+                        onFilterChange("modelName", null);
                       }
                     }}
                     className={`text-shadow-md flex items-center p-1 gap-2 rounded cursor-pointer transition-colors hover:bg-slate-50 ${

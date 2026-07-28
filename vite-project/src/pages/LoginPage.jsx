@@ -33,7 +33,8 @@ export const LoginPage = ({ t }) => {
       login(res.data.user);
       navigate("/");
     } catch (error) {
-      setErr(error.response?.data?.error || "Bir hata oluştu.");
+      console.log(error.message);
+      setErr(t.error);
     }
   };
 
@@ -68,7 +69,7 @@ export const LoginPage = ({ t }) => {
         <p
           className="justify-self-end text-[10px] text-blue-600 hover:cursor-pointer hover:underline"
           onClick={() => {
-            navigate("/psswrdrst");
+            navigate("/forgot-password");
           }}
         >
           {t.forgotYourPassword}

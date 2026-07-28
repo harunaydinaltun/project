@@ -12,7 +12,7 @@ export const BodyTypeFilterBox = ({
   return (
     <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg">
       <div className="flex justify-evenly" onClick={() => setIsOpen(!isOpen)}>
-        <div className="pl-1 text-shadow-md">{t.bodyType || "Body Type"}</div>
+        <div className="pl-1 text-shadow-md">{t.bodyType}</div>
         <span
           className={`text-shadow-md text-xs transform duration-500 ${isOpen ? "rotate-x-180" : ""}`}
         >

@@ -86,7 +86,7 @@ export const Home = ({ t, setLang, lang }) => {
                 value={startDate}
                 min={today}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                className="p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all [&::-webkit-calendar-picker-indicator]:cursor-pointer"
               />
             </div>
 
@@ -99,13 +99,13 @@ export const Home = ({ t, setLang, lang }) => {
                 value={endDate}
                 min={startDate || today}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all"
+                className="p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all [&::-webkit-calendar-picker-indicator]:cursor-pointer"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base mt-2"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base mt-2 hover:cursor-pointer hover:scale-[0.99]"
             >
               {t.search || "Ara"}
             </button>
@@ -114,7 +114,7 @@ export const Home = ({ t, setLang, lang }) => {
           {!currentUser ? (
             <button
               onClick={() => navigate("/login")}
-              className="w-full bg-green-500 hover:bg-green-600 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base -mt-1"
+              className="w-full bg-green-500 hover:bg-green-600 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base -mt-1 hover:cursor-pointer hover:scale-[0.99]"
             >
               {t.login}
             </button>

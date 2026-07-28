@@ -110,7 +110,9 @@
     "telnoError": "Telefon numaranız \"05\" ile başlamalı",
     "fieldError": "Lütfen formdaki hataları düzeltip tekrar deneyin.",
     "emptyFieldError": "Lütfen tüm alanları doldurun.",
-    "registrationError": "Kayıt sırasında hata oluştu."
+    "registrationError": "Kayıt sırasında hata oluştu.",
+    "error": "Bir hata oluştu.",
+    "passwordResetMessage": "Hesabınıza kayıtlı e-posta adresini girin, size bir sıfırlama bağlantısı gönderelim."
   },
   "en": {
     "ID": "ID",
@@ -223,6 +225,8 @@
     "telnoError": "Your phone number must start with \"05\".",
     "fieldError": "Please correct the errors in the form and try again.",
     "emptyFieldError": "Please fill in all fields.",
-    "registrationError": "An error occurred during registration."
+    "registrationError": "An error occurred during registration.",
+    "error": "An error occurred.",
+    "passwordResetMessage": "Enter the email address associated with your account, and we'll send you a password reset link."
   }
 }

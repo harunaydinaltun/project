@@ -1,6 +1,9 @@
 import { db } from "../connect.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
+import { error } from "console";
 
 export const register = async (req, res) => {
   const { username, password, tel_no, email, birthdate, name, surname } =
@@ -97,10 +100,44 @@ export const register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
     const [result] = await db.query(
-      "INSERT INTO customers (username,password,tel_no,email,birthdate,name,surname) VALUES (?,?,?,?,?,?,?)",
-      [username, hashedPassword, tel_no, email, birthdate, name, surname],
+      "INSERT INTO customers (username, password, tel_no, email, birthdate, name, surname, verification_token) VALUES (?,?,?,?,?,?,?,?)",
+      [
+        username,
+        hashedPassword,
+        tel_no,
+        email,
+        birthdate,
+        name,
+        surname,
+        verificationToken,
+      ],
     );
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const verifyLink = `http://localhost:5173/verify-email/${verificationToken}`;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "E-Posta Adresinizi Doğrulayın - Araba Kiralama",
+      html: `
+        <h3>Hoş Geldiniz, ${name}!</h3>
+        <p>Kayıt işleminizi tamamlamak için lütfen aşağıdaki bağlantıya tıklayarak e-posta adresinizi doğrulayın:</p>
+        <a href="${verifyLink}" target="_blank">Hesabımı Doğrula</a>
+        <br/><br/>
+        <p>Eğer bu işlemi siz yapmadıysanız bu mesajı görmezden gelebilirsiniz.</p>
+      `,
+    });
 
     res.status(201).json({ message: "User has been created succesfuly!" });
   } catch (error) {
@@ -129,6 +166,13 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: "Wrong username or password" });
     }
 
+    if (user.is_verified === 0) {
+      return res.status(403).json({
+        error:
+          "Lütfen giriş yapmadan önce e-posta adresinize gönderilen bağlantı ile hesabınızı onaylayın.",
+      });
+    }
+
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: "24h",
     });
@@ -148,4 +192,147 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
   res.status(200).json({ message: "User has been logged out successfully!" });
+};
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: "Please enter your email adress" });
+  }
+
+  try {
+    const [users] = await db.query("SELECT * FROM customers WHERE email = ?", [
+      email,
+    ]);
+    if (users.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 3600000);
+
+    await db.query("DELETE FROM password_resets WHERE email = ?", [email]);
+    await db.query(
+      "INSERT INTO password_resets (email, token, expires_at) VALUES (?,?,?)",
+      [email, token, expiresAt],
+    );
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const resetLink = `http://localhost:5173/reset-password/${token}`;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Şifre Sıfırlama Talebi - Araba Kiralama",
+      html: `
+        <h3>Şifre Sıfırlama Talebi</h3>
+        <p>Hesabınız için şifre sıfırlama talebinde bulundunuz.</p>
+        <p>Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:</p>
+        <a href="${resetLink}" target="_blank">Şifremi Sıfırla</a>
+        <br/><br/>
+        <p>Bu bağlantı <b>1 saat</b> boyunca geçerlidir. Eğer bu talebi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.</p>
+      `,
+    });
+
+    res.status(200).json({
+      message: "Şifre sıfırlama bağlantısı e-posta adresine gönderildi.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Sunucu tarafı hata" });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ error: "Eksik bilgi gönderildi" });
+  }
+
+  if (
+    newPassword.length < 6 ||
+    newPassword.length > 64 ||
+    !/[a-zçğıöşü]+/.test(newPassword) ||
+    !/[A-ZÇĞİÖŞÜ]+/.test(newPassword) ||
+    !/[0-9]+/.test(newPassword) ||
+    !/[!-/]+/.test(newPassword) ||
+    /\s/.test(newPassword)
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Yeni şifreniz güvenlik gereksinimlerini karşılamıyor." });
+  }
+
+  try {
+    const [resets] = await db.query(
+      "SELECT * FROM password_resets WHERE token = ? AND expires_at > NOW()",
+      [token],
+    );
+
+    if (resets.length === 0) {
+      return res
+        .status(400)
+        .json({ error: "Bağlantı geçersiz veya süresi dolmuş" });
+    }
+
+    const email = resets[0].email;
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await db.query("UPDATE customers SET password = ? WHERE email = ?", [
+      hashedPassword,
+      email,
+    ]);
+    await db.query("DELETE FROM password_resets WHERE email = ?", [email]);
+
+    res.status(200).json({ message: "Şifre başarıyla güncellendi" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Sunucu tarafı hata" });
+  }
+};
+
+export const verifyEmail = async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) return res.status(400).json({ error: "Token bulunamadı." });
+
+  try {
+    // Token'a sahip kullanıcıyı bul
+    const [users] = await db.query(
+      "SELECT * FROM customers WHERE verification_token = ?",
+      [token],
+    );
+
+    if (users.length === 0) {
+      return res.status(400).json({
+        error: "Geçersiz veya daha önce kullanılmış onay bağlantısı.",
+      });
+    }
+
+    const user = users[0];
+
+    // Kullanıcıyı onayla ve token'ı sil
+    await db.query(
+      "UPDATE customers SET is_verified = 1, verification_token = NULL WHERE id = ?",
+      [user.id],
+    );
+
+    res.status(200).json({
+      message:
+        "E-posta adresiniz başarıyla doğrulandı! Artık giriş yapabilirsiniz.",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Sunucu tarafında bir hata oluştu." });
+  }
 };

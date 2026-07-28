@@ -16,8 +16,10 @@ import RegisterPage from "./pages/RegisterPage";
 import Test from "./pages/Test";
 import { Navbar } from "./components/Navbar";
 import { LoginPage } from "./pages/LoginPage";
-import ForgotYourPasswordPage from "./pages/ForgotYourPasswordPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
 
 const getSystemLanguage = () => {
   const browserLang = navigator.language || navigator.userLanguage || "";
@@ -72,9 +74,17 @@ export const AppContent = () => {
           element={currentUser ? <Navigate to="/" /> : <LoginPage t={t} />}
         ></Route>
         <Route
-          path="/psswrdrst/"
-          element={<ForgotYourPasswordPage t={t} />}
+          path="/forgot-password/"
+          element={<ForgotPasswordPage t={t} />}
         ></Route>
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPasswordPage t={t} />}
+        />
+        <Route
+          path="/verify-email/:token"
+          element={<VerifyEmailPage t={t} />}
+        />
       </Routes>
     </div>
   );
