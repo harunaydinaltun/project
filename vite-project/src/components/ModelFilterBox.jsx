@@ -3,10 +3,10 @@ import { useState } from "react";
 export const ModelFilterBox = ({ t, models = [], filters, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const selectedBrand = filters?.brand;
-  const selectedModel = filters?.modelName;
+  const selectedBrands = filters?.brand || [];
+  const selectedModels = filters?.modelName || [];
 
-  const isDisabled = !selectedBrand;
+  const isDisabled = selectedBrands.length === 0;
 
   const handleToggle = () => {
     if (isDisabled) return;
@@ -41,7 +41,7 @@ export const ModelFilterBox = ({ t, models = [], filters, onFilterChange }) => {
           <div className="pt-2 flex flex-col gap-1">
             {Array.isArray(models) && models.length > 0 ? (
               models.map((model) => {
-                const isSelected = selectedModel === model;
+                const isSelected = selectedModels.includes(model);
 
                 return (
                   <div

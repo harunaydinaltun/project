@@ -14,28 +14,23 @@ const ResultsPage = ({ t }) => {
   const [initialCars, setInitialCars] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 12;
+  const [totalPages, setTotalPages] = useState(1);
 
   const [filters, setFilters] = useState({
-    brand: null,
-    modelName: null,
-    color: null,
-    locationId: null,
-    bodyType: null,
-    doors: null,
-    fuelType: null,
-    gearType: null,
-    minAge: null,
+    brand: [],
+    modelName: [],
+    color: [],
+    locationId: [],
+    bodyType: [],
+    doors: [],
+    fuelType: [],
+    gearType: [],
+    minAge: [],
+    maxPrice: 15000,
+    userAge: 25,
   });
 
-  const handleFilterChange = (filterKey, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [filterKey]: prev[filterKey] === value ? null : value,
-    }));
-
-    setCurrentPage(1);
-  };
+  const [debouncedFilters, setDebouncedFilters] = useState(filters);
 
   useEffect(() => {
     if (!startDate || !endDate) {
@@ -48,11 +43,39 @@ const ResultsPage = ({ t }) => {
         `http://localhost:8800/api/cars/available?startDate=${startDate}&endDate=${endDate}`,
       )
       .then((res) => {
-        setInitialCars(res.data);
-        setCars(res.data);
+        setInitialCars(res.data.data);
+        setCars(res.data.data);
       })
       .catch((err) => console.error(err));
   }, [startDate, endDate, navigate]);
+
+  const handleFilterChange = (filterKey, value) => {
+    setFilters((prev) => {
+      if (filterKey === "maxPrice" || filterKey === "userAge") {
+        return { ...prev, [filterKey]: Number(value) };
+      }
+
+      const currentList = prev[filterKey] || [];
+
+      if (currentList.includes(value)) {
+        return {
+          ...prev,
+          [filterKey]: currentList.filter((item) => item !== value),
+        };
+      } else {
+        return { ...prev, [filterKey]: [...currentList, value] };
+      }
+    });
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFilters(filters);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [filters]);
 
   useEffect(() => {
     if (!startDate || !endDate) return;
@@ -60,39 +83,46 @@ const ResultsPage = ({ t }) => {
     const queryParams = new URLSearchParams();
     queryParams.append("startDate", startDate);
     queryParams.append("endDate", endDate);
+    queryParams.append("page", currentPage);
 
-    Object.keys(filters).forEach((key) => {
-      if (filters[key]) {
-        queryParams.append(key, filters[key]);
+    Object.keys(debouncedFilters).forEach((key) => {
+      if (key === "maxPrice" || key === "userAge") {
+        queryParams.append(key, debouncedFilters[key]);
+      } else if (debouncedFilters[key].length > 0) {
+        queryParams.append(key, debouncedFilters[key].join(","));
       }
     });
 
     axios
       .get(`http://localhost:8800/api/cars/available?${queryParams.toString()}`)
-      .then((res) => setCars(res.data))
+      .then((res) => {
+        setCars(res.data.data);
+        setTotalPages(res.data.pagination.totalPages);
+      })
       .catch((err) => console.error(err));
-  }, [startDate, endDate, filters]);
+  }, [startDate, endDate, debouncedFilters, currentPage]);
 
   const availableBrands = [
     ...new Set(initialCars.map((c) => c.brand).filter(Boolean)),
   ];
 
-  const availableModels = filters.brand
-    ? [
-        ...new Set(
-          initialCars
-            .filter((c) => c.brand === filters.brand)
-            .map((c) => c.modelName)
-            .filter(Boolean),
-        ),
-      ]
-    : [];
+  const availableModels =
+    filters.brand.length > 0
+      ? [
+          ...new Set(
+            initialCars
+              .filter((c) => filters.brand.includes(c.brand))
+              .map((c) => c.modelName)
+              .filter(Boolean),
+          ),
+        ]
+      : [];
 
   const baseFilteredCars = initialCars.filter((c) => {
-    const matchBrand = filters.brand ? c.brand === filters.brand : true;
-    const matchModel = filters.modelName
-      ? c.modelName === filters.modelName
-      : true;
+    const matchBrand =
+      filters.brand.length === 0 || filters.brand.includes(c.brand);
+    const matchModel =
+      filters.modelName.length === 0 || filters.modelName.includes(c.modelName);
     return matchBrand && matchModel;
   });
 
@@ -114,12 +144,6 @@ const ResultsPage = ({ t }) => {
   const availableMinAges = [
     ...new Set(baseFilteredCars.map((c) => c.minAge).filter(Boolean)),
   ];
-
-  const totalPages = Math.ceil(cars.length / itemsPerPage);
-  const indexOfLastCar = currentPage * itemsPerPage;
-  const indexOfFirstCar = indexOfLastCar - itemsPerPage;
-
-  const currentCars = cars.slice(indexOfFirstCar, indexOfLastCar);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -145,19 +169,21 @@ const ResultsPage = ({ t }) => {
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-3">
-            {currentCars.map((car) => (
+            {cars.map((car) => (
               <CarCard
                 key={car.car_id || car.id}
                 car={car}
                 t={t}
                 totalDays={totalDays}
+                startDate={startDate}
+                endDate={endDate}
               />
             ))}
           </div>
 
           {cars.length === 0 && (
             <div className="text-center text-gray-500 py-10">
-              Aradığınız kriterlere uygun araç bulunamadı.
+              {t.noCarFound}
             </div>
           )}
         </div>

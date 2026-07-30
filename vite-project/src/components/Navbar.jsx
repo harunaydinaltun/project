@@ -75,7 +75,7 @@ export const Navbar = ({ t, setLang, lang }) => {
               className="bg-blue-600 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-blue-500 hover:bg-blue-700 transition-all duration-300 p-1 hover:scale-[0.98] hover:cursor-pointer"
               onClick={() => navigate("/profile")}
             >
-              {t.myProfile}
+              {t.myProfile}👤
             </button>
             <button
               className="bg-red-500 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-red-400 hover:bg-red-600 transition-all duration-300 p-1 hover:scale-[0.98] hover:cursor-pointer"

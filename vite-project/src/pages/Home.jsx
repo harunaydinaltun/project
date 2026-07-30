@@ -53,27 +53,37 @@ export const Home = ({ t, setLang, lang }) => {
         <div className="flex-1 flex flex-col justify-center p-8 md:p-10 gap-5">
           <div className="w-11 flex self-end gap-x-1">
             <TR
-              className={`hover:cursor-pointer ${lang === "tr" ? "" : "opacity-50"}`}
+              className={`hover:cursor-pointer transition-all duration-100 ${lang === "tr" ? "scale-[1.1]" : "opacity-50 "}`}
               onClick={() => {
                 setLang("tr");
               }}
             ></TR>
             <GB
-              className={`hover:cursor-pointer ${lang === "en" ? "" : "opacity-50"}`}
+              className={`hover:cursor-pointer transition-all duration-100 ${lang === "en" ? "scale-[1.1]" : "opacity-50"}`}
               onClick={() => {
                 setLang("en");
               }}
             ></GB>
           </div>
+
           <form onSubmit={handleSearch} className="flex flex-col gap-4">
             {currentUser ? (
-              <h3 className="text-xs font-semibold text-green-600">
-                {t.welcome}, {currentUser.username}
-              </h3>
+              <div className="flex flex-col items-start">
+                <span className="text-xs font-semibold text-green-600">
+                  {t.welcome}, {currentUser.username}
+                </span>
+                <button
+                  className=" rounded-lg p-1 text-shadow-lg bg-slate-100 text-[13px] cursor-pointer hover:bg-slate-200 hover:scale-[0.99] transition-all duration-300"
+                  type="button"
+                  onClick={() => navigate("/profile")}
+                >
+                  👤{t.myProfile}
+                </button>
+              </div>
             ) : (
               ""
             )}
-            <h2 className="text-slate-800 text-2xl font-semibold mb-2">
+            <h2 className="text-slate-800 text-shadow-xs text-2xl font-semibold mb-2">
               {t.searchCar || "Araç Ara"}
             </h2>
 
@@ -107,17 +117,25 @@ export const Home = ({ t, setLang, lang }) => {
               type="submit"
               className="w-full bg-blue-600 hover:bg-blue-700 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base mt-2 hover:cursor-pointer hover:scale-[0.99]"
             >
-              {t.search || "Ara"}
+              {t.search}
             </button>
           </form>
 
           {!currentUser ? (
-            <button
-              onClick={() => navigate("/login")}
-              className="w-full bg-green-500 hover:bg-green-600 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base -mt-1 hover:cursor-pointer hover:scale-[0.99]"
-            >
-              {t.login}
-            </button>
+            <div className="flex gap-1">
+              <button
+                onClick={() => navigate("/register")}
+                className="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 text-shadow-xs font-medium p-3 rounded-lg transition-all text-base -mt-1 hover:cursor-pointer hover:scale-[0.98]"
+              >
+                {t.register}
+              </button>
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full bg-green-500 hover:bg-green-600 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base -mt-1 hover:cursor-pointer hover:scale-[0.98]"
+              >
+                {t.login}
+              </button>
+            </div>
           ) : (
             ""
           )}

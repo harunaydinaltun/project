@@ -1,8 +1,14 @@
 import { CAR_COLORS } from "../constants/carConstants.js";
 import { useState } from "react";
 
-const ColorFilterBox = ({ t, colors = [], selectedColor, onFilterChange }) => {
+const ColorFilterBox = ({
+  t,
+  colors = [],
+  selectedColor = [],
+  onFilterChange,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const selectedColorsArray = selectedColor || [];
 
   const filteredCarColors = CAR_COLORS.filter((c) => colors.includes(c.name));
 
@@ -32,7 +38,7 @@ const ColorFilterBox = ({ t, colors = [], selectedColor, onFilterChange }) => {
           <div className="pt-2 flex flex-col gap-1">
             {filteredCarColors.length > 0 ? (
               filteredCarColors.map((c) => {
-                const isSelected = selectedColor === c.name;
+                const isSelected = selectedColorsArray.includes(c.name);
 
                 return (
                   <div

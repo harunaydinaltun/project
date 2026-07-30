@@ -6,6 +6,7 @@ import DoorsFilterBox from "./DoorsFilterBox";
 import FuelTypeFilterBox from "./FuelTypeFilterBox";
 import GearTypeFilterBox from "./GearTypeFilterBox";
 import MinAgeFilterBox from "./MinAgeFilterBox";
+import PriceFilterBox from "./PriceFilterBox";
 
 const SearchSideBar = ({
   t,
@@ -17,7 +18,6 @@ const SearchSideBar = ({
   doors,
   fuelTypes,
   gearTypes,
-  minAges,
   onFilterChange,
 }) => {
   return (
@@ -37,12 +37,6 @@ const SearchSideBar = ({
       <GearTypeFilterBox
         t={t}
         gearTypes={gearTypes}
-        filters={filters}
-        onFilterChange={onFilterChange}
-      />
-      <MinAgeFilterBox
-        t={t}
-        minAges={minAges}
         filters={filters}
         onFilterChange={onFilterChange}
       />
@@ -68,6 +62,16 @@ const SearchSideBar = ({
         t={t}
         fuelTypes={fuelTypes}
         filters={filters}
+        onFilterChange={onFilterChange}
+      />
+      <MinAgeFilterBox
+        t={t}
+        userAge={filters.userAge}
+        onFilterChange={onFilterChange}
+      />
+      <PriceFilterBox
+        t={t}
+        maxPrice={filters.maxPrice}
         onFilterChange={onFilterChange}
       />
     </div>

@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export const BrandFilterBox = ({ t, brands = [], filters, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const selectedBrand = filters?.brand;
+  const selectedBrands = filters?.brand || [];
 
   return (
     <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg">
@@ -25,16 +25,13 @@ export const BrandFilterBox = ({ t, brands = [], filters, onFilterChange }) => {
           <div className="pt-2 flex flex-col gap-1">
             {Array.isArray(brands) && brands.length > 0 ? (
               brands.map((brand) => {
-                const isSelected = selectedBrand === brand;
+                const isSelected = selectedBrands.includes(brand);
 
                 return (
                   <div
                     key={brand}
                     onClick={() => {
                       onFilterChange("brand", brand);
-                      if (filters?.modelName) {
-                        onFilterChange("modelName", null);
-                      }
                     }}
                     className={`text-shadow-md flex items-center p-1 gap-2 rounded cursor-pointer transition-colors hover:bg-slate-50 ${
                       isSelected

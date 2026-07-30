@@ -7,7 +7,7 @@ export const FuelTypeFilterBox = ({
   onFilterChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const selectedValue = filters?.fuelType;
+  const selectedValues = filters?.fuelType || [];
 
   return (
     <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg">
@@ -26,7 +26,7 @@ export const FuelTypeFilterBox = ({
           <div className="pt-2 flex flex-col gap-1">
             {Array.isArray(fuelTypes) && fuelTypes.length > 0 ? (
               fuelTypes.map((item) => {
-                const isSelected = selectedValue === item;
+                const isSelected = selectedValues.includes(item);
                 return (
                   <div
                     key={item}

@@ -63,7 +63,7 @@ export const ForgotPasswordPage = ({ t }) => {
           disabled={loading}
           className="place-self-center bg-blue-500 text-slate-200 ring-1 ring-blue-400 shadow-xs rounded-sm w-full mt-2 p-2 transition-all duration-75 hover:scale-[0.99] disabled:opacity-50"
         >
-          {loading ? "Gönderiliyor..." : "Bağlantı Gönder"}
+          {loading ? t.sending : t.sendLink}
         </button>
 
         {message && (

@@ -112,7 +112,10 @@
     "emptyFieldError": "Lütfen tüm alanları doldurun.",
     "registrationError": "Kayıt sırasında hata oluştu.",
     "error": "Bir hata oluştu.",
-    "passwordResetMessage": "Hesabınıza kayıtlı e-posta adresini girin, size bir sıfırlama bağlantısı gönderelim."
+    "passwordResetMessage": "Hesabınıza kayıtlı e-posta adresini girin, size bir sıfırlama bağlantısı gönderelim.",
+    "sending": "Gönderiliyor...",
+    "sendLink": "Bağlantı Gönder",
+    "noCarFound": "Aradığınız kriterlere uygun araç bulunamadı."
   },
   "en": {
     "ID": "ID",
@@ -227,6 +230,9 @@
     "emptyFieldError": "Please fill in all fields.",
     "registrationError": "An error occurred during registration.",
     "error": "An error occurred.",
-    "passwordResetMessage": "Enter the email address associated with your account, and we'll send you a password reset link."
+    "passwordResetMessage": "Enter the email address associated with your account, and we'll send you a password reset link.",
+    "sending": "Sending...",
+    "sendLink": "Send Link",
+    "noCarFound": "No cars found matching your search criteria."
   }
 }

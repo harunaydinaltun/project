@@ -10,8 +10,7 @@ import languages from "./lang/languages.json";
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 import ResultsPage from "./pages/ResultsPage";
-import DetailsPage from "./pages/DetailsPage";
-import AdminEditCarPage from "./pages/AdminEditCarPage";
+import CarDetailsPage from "./pages/CarDetailsPage";
 import RegisterPage from "./pages/RegisterPage";
 import Test from "./pages/Test";
 import { Navbar } from "./components/Navbar";
@@ -61,10 +60,10 @@ export const AppContent = () => {
           }
         ></Route>
         <Route path="/results" element={<ResultsPage t={t} />}></Route>
-        <Route path="/details/:id" element={<DetailsPage t={t} />}></Route>
-        <Route path="/edit/:id" element={<AdminEditCarPage t={t} />}></Route>
-        <Route path="/details/" element={<DetailsPage t={t} />}></Route>
-        <Route path="/edit/" element={<AdminEditCarPage t={t} />}></Route>
+        <Route path="/cars/:id" element={<CarDetailsPage t={t} />}></Route>
+
+        <Route path="/details/" element={<CarDetailsPage t={t} />}></Route>
+
         <Route
           path="/register/"
           element={currentUser ? <Navigate to="/" /> : <RegisterPage t={t} />}

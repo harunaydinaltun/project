@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const MinAgeFilterBox = ({ t, userAge, onFilterChange }) => {
+const PriceFilterBox = ({ t, maxPrice, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -10,7 +10,7 @@ export const MinAgeFilterBox = ({ t, userAge, onFilterChange }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="pl-1 text-shadow-md text-sm font-semibold text-slate-700">
-          {t.minAge}
+          {t.totalPrice}
         </div>
         <span
           className={`text-shadow-md text-xs transform duration-500 ${isOpen ? "rotate-180" : ""}`}
@@ -25,15 +25,15 @@ export const MinAgeFilterBox = ({ t, userAge, onFilterChange }) => {
         <div className="overflow-hidden">
           <div className="pt-3 pb-1 px-1 flex flex-col gap-2">
             <span className="text-xs text-center font-bold text-blue-600">
-              {userAge}+ Yaş
+              {maxPrice} ₺
             </span>
             <input
               type="range"
-              min="18"
-              max="75"
-              step="1"
-              value={userAge}
-              onChange={(e) => onFilterChange("userAge", e.target.value)}
+              min="500"
+              max="15000"
+              step="500"
+              value={maxPrice}
+              onChange={(e) => onFilterChange("maxPrice", e.target.value)}
               className="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-500"
             />
           </div>
@@ -43,4 +43,4 @@ export const MinAgeFilterBox = ({ t, userAge, onFilterChange }) => {
   );
 };
 
-export default MinAgeFilterBox;
+export default PriceFilterBox;

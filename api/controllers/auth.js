@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
-import { error } from "console";
 
 export const register = async (req, res) => {
   const { username, password, tel_no, email, birthdate, name, surname } =
@@ -307,7 +306,6 @@ export const verifyEmail = async (req, res) => {
   if (!token) return res.status(400).json({ error: "Token bulunamadı." });
 
   try {
-    // Token'a sahip kullanıcıyı bul
     const [users] = await db.query(
       "SELECT * FROM customers WHERE verification_token = ?",
       [token],
@@ -321,18 +319,43 @@ export const verifyEmail = async (req, res) => {
 
     const user = users[0];
 
-    // Kullanıcıyı onayla ve token'ı sil
-    await db.query(
-      "UPDATE customers SET is_verified = 1, verification_token = NULL WHERE id = ?",
-      [user.id],
-    );
+    let attempt = 0;
+    const maxAttempts = 3;
+    let isUpdated = false;
+
+    while (attempt < maxAttempts && !isUpdated) {
+      try {
+        attempt++;
+        await db.query(
+          "UPDATE customers SET is_verified = 1, verification_token = NULL WHERE id = ?",
+          [user.id],
+        );
+        isUpdated = true;
+      } catch (updateError) {
+        console.error(
+          `Güncelleme denemesi ${attempt} başarısız: `,
+          updateError,
+        );
+
+        if (attempt === maxAttempts) {
+          throw updateError;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    }
 
     res.status(200).json({
       message:
         "E-posta adresiniz başarıyla doğrulandı! Artık giriş yapabilirsiniz.",
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Sunucu tarafında bir hata oluştu." });
+    console.error(
+      "Maksimum deneme sayısına ulaşıldı, işlem başarısız: ",
+      error,
+    );
+    res.status(500).json({
+      error:
+        "Sunucu tarafında bir hata oluştu. Lütfen bir kaç dakika sonra tekrar deneyiniz",
+    });
   }
 };

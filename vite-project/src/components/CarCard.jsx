@@ -1,4 +1,12 @@
-export const CarCard = ({ t, car, totalDays }) => {
+import { useNavigate } from "react-router-dom";
+
+export const CarCard = ({ t, car, totalDays, startDate, endDate }) => {
+  const navigate = useNavigate();
+  const handleViewDetails = () => {
+    navigate(`/cars/${car.car_id}`, {
+      state: { car, totalDays, startDate, endDate },
+    });
+  };
   return (
     <div className="flex flex-col p-2 justify-center items-center bg-slate-50 rounded-2xl hover:shadow-2xl duration-400 min-w-40 max-w-60">
       <img
@@ -16,10 +24,13 @@ export const CarCard = ({ t, car, totalDays }) => {
       </span>
 
       <span className="text-shadow-lg">
-        {t.totalPrice}: {car.dailyPrice * totalDays + car.deposit}₺
+        {t.totalPrice}: {car.dailyPrice * totalDays}₺
       </span>
       <span className="text-sm text-shadow-lg">{car.locationId} 🚩</span>
-      <button className="bg-cyan-500 rounded-xl p-1 cursor-pointert text-slate-200 text-shadow-md focus:border-cyan-600 hover:bg-cyan-700 duration-300">
+      <button
+        onClick={handleViewDetails}
+        className="bg-cyan-500 rounded-xl p-1 cursor-pointert text-slate-200 text-shadow-md focus:border-cyan-600 hover:bg-cyan-700 duration-300 cursor-pointer active:scale-[0.99]"
+      >
         {t.viewDetails}
       </button>
       <div className="flex flex-col items-start w-full mt-1.5 border-t">

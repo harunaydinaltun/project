@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export const DoorsFilterBox = ({ t, doors = [], filters, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const selectedValue = filters?.doors;
+  const selectedValues = filters?.doors || [];
 
   return (
     <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg">
@@ -21,7 +21,7 @@ export const DoorsFilterBox = ({ t, doors = [], filters, onFilterChange }) => {
           <div className="pt-2 flex flex-col gap-1">
             {Array.isArray(doors) && doors.length > 0 ? (
               doors.map((item) => {
-                const isSelected = selectedValue === item;
+                const isSelected = selectedValues.includes(item);
                 return (
                   <div
                     key={item}
