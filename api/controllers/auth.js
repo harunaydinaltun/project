@@ -359,3 +359,70 @@ export const verifyEmail = async (req, res) => {
     });
   }
 };
+
+export const adminLogin = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const [admins] = await db.query("SELECT * FROM admins WHERE username = ?", [
+      username,
+    ]);
+
+    if (admins.length === 0) {
+      return res.status(404).json({ error: "Admin not found!" });
+    }
+
+    const admin = admins[0];
+    const isPasswordValid = await bcrypt.compare(password, admin.password);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Wrong username or password" });
+    }
+
+    const token = jwt.sign(
+      { id: admin.id, role: admin.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "12h" },
+    );
+
+    const { password: adminPassword, ...otherDetails } = admin;
+
+    res.status(200).json({
+      message: "Admin login succesful!",
+      token: token,
+      admin: otherDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Backend error!" });
+  }
+};
+
+export const adminRegister = async (req, res) => {
+  const { username, email, password } = req.body;
+
+  if (!username || !email || !password) {
+    return res.status(400).json({ error: "Please fill all fields!" });
+  }
+
+  try {
+    const [existingAdmin] = await db.query(
+      "SELECT * FROM admins WHERE username = ? OR email = ?",
+      [username, email],
+    );
+
+    if (existingAdmin.length > 0) {
+      return res.status(400).json({ error: "This admin is already exists!" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await db.query(
+      "INSERT INTO admins (username, email, password, role) VALUES (?, ?, ?, 'admin')",
+      [username, email, hashedPassword],
+    );
+    res.status(201).json({ message: "Admin created successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Backend error" });
+  }
+};

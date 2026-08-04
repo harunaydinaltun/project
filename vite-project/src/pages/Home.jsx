@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import logo from "../assets/placeholders/logo_transparent.png";
 import { TR, GB } from "country-flag-icons/react/3x2";
 
 export const Home = ({ t, setLang, lang }) => {
   const navigate = useNavigate();
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useAuth();
   const today = new Date().toISOString().split("T")[0];
 
   const [startDate, setStartDate] = useState("");

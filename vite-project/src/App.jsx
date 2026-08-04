@@ -7,8 +7,8 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home";
 import languages from "./lang/languages.json";
-import { useEffect, useState, useContext } from "react";
-import { AuthContext } from "./context/AuthContext";
+import { useEffect, useState } from "react";
+import { useAuth } from "./context/AuthContext";
 import ResultsPage from "./pages/ResultsPage";
 import CarDetailsPage from "./pages/CarDetailsPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -19,6 +19,9 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminPanelPage from "./pages/AdminPanelPage";
+import { AdminRoute } from "./components/panelcomponents/AdminRoute";
 
 const getSystemLanguage = () => {
   const browserLang = navigator.language || navigator.userLanguage || "";
@@ -29,7 +32,7 @@ const getSystemLanguage = () => {
 
 export const AppContent = () => {
   const location = useLocation();
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useAuth();
 
   const [lang, setLang] = useState(() => {
     const savedLang = localStorage.getItem("app_language");
@@ -83,6 +86,15 @@ export const AppContent = () => {
         <Route
           path="/verify-email/:token"
           element={<VerifyEmailPage t={t} />}
+        />
+        <Route path="/adminlogin/" element={<AdminLoginPage t={t} />} />
+        <Route
+          path="/admin/"
+          element={
+            <AdminRoute>
+              <AdminPanelPage />
+            </AdminRoute>
+          }
         />
       </Routes>
     </div>

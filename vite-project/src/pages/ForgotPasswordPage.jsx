@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import logo from "../assets/placeholders/logo_transparent.png";
 import { CustomInput } from "../components/CustomInput";
+import api from "../utils/api";
 
 export const ForgotPasswordPage = ({ t }) => {
   const [email, setEmail] = useState("");
@@ -18,10 +18,7 @@ export const ForgotPasswordPage = ({ t }) => {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://localhost:8800/api/auth/forgot-password",
-        { email },
-      );
+      const res = await api.post("/auth/forgot-password", { email });
       setMessage(res.data.message);
     } catch (err) {
       console.log(err.message);

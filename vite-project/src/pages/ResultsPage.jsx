@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { CarCard } from "../components/CarCard";
-import axios from "axios";
 import SearchSideBar from "../components/SearchSideBar";
+import api from "../utils/api";
 
 const ResultsPage = ({ t }) => {
   const location = useLocation();
@@ -38,10 +38,8 @@ const ResultsPage = ({ t }) => {
       return;
     }
 
-    axios
-      .get(
-        `http://localhost:8800/api/cars/available?startDate=${startDate}&endDate=${endDate}`,
-      )
+    api
+      .get(`/cars/available?startDate=${startDate}&endDate=${endDate}`)
       .then((res) => {
         setInitialCars(res.data.data);
         setCars(res.data.data);
@@ -93,8 +91,8 @@ const ResultsPage = ({ t }) => {
       }
     });
 
-    axios
-      .get(`http://localhost:8800/api/cars/available?${queryParams.toString()}`)
+    api
+      .get(`/cars/available?${queryParams.toString()}`)
       .then((res) => {
         setCars(res.data.data);
         setTotalPages(res.data.pagination.totalPages);

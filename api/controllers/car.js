@@ -1,4 +1,3 @@
-import { parse } from "dotenv";
 import { db } from "../connect.js";
 
 export const getAvailableCars = async (req, res) => {
@@ -11,6 +10,8 @@ export const getAvailableCars = async (req, res) => {
     locationId,
     bodyType,
     doors,
+    engineSize,
+    trim,
     fuelType,
     gearType,
     maxPrice,
@@ -37,7 +38,7 @@ export const getAvailableCars = async (req, res) => {
   const parseMultiple = (val) => val.split(",");
 
   if (color) {
-    baseQuery += ` AND models.color IN (?)`;
+    baseQuery += ` AND cars.color IN (?)`;
     queryParams.push(parseMultiple(color));
   }
   if (modelName) {
@@ -69,6 +70,14 @@ export const getAvailableCars = async (req, res) => {
     baseQuery += ` AND models.gearType IN (?)`;
     queryParams.push(parseMultiple(gearType));
   }
+  if (trim) {
+    baseQuery += ` AND models.gearType IN (?)`;
+    queryParams.push(parseMultiple(trim));
+  }
+  if (engineSize) {
+    baseQuery += ` AND models.gearType IN (?)`;
+    queryParams.push(parseMultiple(engineSize));
+  }
   if (maxPrice) {
     baseQuery += ` AND cars.dailyPrice <= ?`;
     queryParams.push(Number(maxPrice));
@@ -85,8 +94,8 @@ export const getAvailableCars = async (req, res) => {
     `
       SELECT 
         cars.id AS car_id, cars.licensePlate, cars.dailyPrice, cars.deposit, cars.locationId,
-        models.color, models.year, models.brand, models.modelName, models.bodyType,
-        models.doors, models.fuelType, models.gearType, models.minAge, models.img
+        cars.color, models.year, models.brand, models.modelName, models.bodyType,
+        models.doors, models.fuelType, models.gearType, models.trim, models.engineSize, models.minAge, models.img
   ` + baseQuery;
 
   const offset = (Number(page) - 1) * Number(limit);
@@ -125,8 +134,10 @@ export const getCar = async (req, res) => {
       cars.dailyPrice,
       cars.deposit,
       cars.locationId,
-      models.color,
+      cars.color,
       models.year,
+      models.trim,
+      models.engineSize,
       models.brand,
       models.bodyType,
       models.doors,
@@ -147,6 +158,34 @@ export const getCar = async (req, res) => {
     return res.status(200).json(data[0]);
   } catch (err) {
     console.error("Backend eror:", err.sqlMessage || err);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: err.sqlMessage || err });
+  }
+};
+
+//DÜZENLE
+export const addCar = async (req, res) => {
+  const { licensePlate, dailyPrice, deposit, locationId, color, modelId } =
+    req.body;
+
+  const query = `
+    INSERT INTO cars (licensePlate, dailyPrice, deposit, locationId, color, modelId)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `;
+
+  try {
+    const [result] = await db.query(query, [
+      licensePlate,
+      dailyPrice,
+      deposit,
+      locationId,
+      color,
+      modelId,
+    ]);
+    return res.status(201).json({ id: result.insertId });
+  } catch (err) {
+    console.error("Backend error:", err.sqlMessage || err);
     return res
       .status(500)
       .json({ message: "Server error", error: err.sqlMessage || err });

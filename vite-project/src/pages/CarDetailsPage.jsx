@@ -1,6 +1,6 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import api from "../utils/api";
 
 export const CarDetailsPage = () => {
   const { id } = useParams();
@@ -37,7 +37,7 @@ export const CarDetailsPage = () => {
 
     const fetchCarDetails = async () => {
       try {
-        const res = await axios.get(`http://localhost:8800/api/cars/${id}`);
+        const res = await api.get(`/cars/${id}`);
         setCar(res.data);
       } catch (err) {
         setError("Araç bilgisi yüklenirken hata oluştu");
@@ -59,6 +59,8 @@ export const CarDetailsPage = () => {
       <p>model: {car.modelName}</p>
       <p>plaka: {car.licensePlate}</p>
       <p>color: {car.color}</p>
+      <p>trim: {car.trim}</p>
+      <p>engineSize: {car.engineSize}</p>
       <p>body: {car.bodyType}</p>
       <p>gear: {car.gearType}</p>
       <p>fuel: {car.fuelType}</p>

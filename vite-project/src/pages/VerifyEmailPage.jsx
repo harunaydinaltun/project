@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import logo from "../assets/placeholders/logo_transparent.png";
+import api from "../utils/api";
 
 export const VerifyEmailPage = () => {
   const { token } = useParams();
@@ -19,10 +19,7 @@ export const VerifyEmailPage = () => {
 
     const verifyToken = async () => {
       try {
-        const res = await axios.post(
-          "http://localhost:8800/api/auth/verify-email",
-          { token },
-        );
+        const res = await api.post("/auth/verify-email", { token });
         setStatus("success");
         setMessage(res.data.message);
 

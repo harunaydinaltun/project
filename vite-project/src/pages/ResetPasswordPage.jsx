@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import logo from "../assets/placeholders/logo_transparent.png";
 import { CustomInput } from "../components/CustomInput";
 import { PasswordConditions } from "../components/PasswordConditions";
+import api from "../utils/api";
 
 export const ResetPasswordPage = ({ t }) => {
   const { token } = useParams();
@@ -62,13 +62,10 @@ export const ResetPasswordPage = ({ t }) => {
     if (password !== confirmPassword) return setError("Şifreler eşleşmiyor.");
 
     try {
-      const res = await axios.post(
-        "http://localhost:8800/api/auth/reset_password",
-        {
-          token,
-          newPassword: password,
-        },
-      );
+      const res = await api.post("/auth/reset_password", {
+        token,
+        newPassword: password,
+      });
       setMessage(res.data.message);
 
       setTimeout(() => navigate("/login"), 3000);

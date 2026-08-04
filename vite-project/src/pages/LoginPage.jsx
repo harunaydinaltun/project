@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/placeholders/logo_transparent.png";
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
-import axios from "axios";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import api from "../utils/api";
 
 export const LoginPage = ({ t }) => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { login } = useAuth();
 
   const [inputs, setInputs] = useState({
     username: "",
@@ -23,10 +23,7 @@ export const LoginPage = ({ t }) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        "http://localhost:8800/api/auth/login",
-        inputs,
-      );
+      const res = await api.post("/auth/login", inputs);
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));

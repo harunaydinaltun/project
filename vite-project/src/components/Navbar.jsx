@@ -1,12 +1,12 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
 import { TR, GB } from "country-flag-icons/react/3x2";
 import logo from "../assets/placeholders/logo_transparent.png";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export const Navbar = ({ t, setLang, lang }) => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useContext(AuthContext);
+  const { currentUser, logout } = useAuth();
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
 
   const handleLogout = () => {
