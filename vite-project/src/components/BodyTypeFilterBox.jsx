@@ -37,6 +37,12 @@ export const BodyTypeFilterBox = ({
                         : ""
                     }`}
                   >
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => {}}
+                      className="form-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
                     <span className="text-xs">{item}</span>
                   </div>
                 );

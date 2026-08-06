@@ -27,7 +27,7 @@ const ResultsPage = ({ t }) => {
     gearType: [],
     minAge: [],
     maxPrice: 15000,
-    userAge: 25,
+    userAge: 18,
   });
 
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
@@ -164,9 +164,9 @@ const ResultsPage = ({ t }) => {
         onFilterChange={handleFilterChange}
       />
 
-      <div className="flex-1 flex flex-col justify-between">
+      <div className="flex-1 flex flex-col justify-between ">
         <div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {cars.map((car) => (
               <CarCard
                 key={car.car_id || car.id}

@@ -34,7 +34,7 @@ const PriceFilterBox = ({ t, maxPrice, onFilterChange }) => {
               step="500"
               value={maxPrice}
               onChange={(e) => onFilterChange("maxPrice", e.target.value)}
-              className="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              className="w-full h-1.5 bg-slate-300 rounded-lg cursor-pointer accent-blue-500"
             />
           </div>
         </div>

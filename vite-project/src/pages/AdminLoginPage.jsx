@@ -35,14 +35,38 @@ export const AdminLoginPage = ({ t }) => {
   };
 
   return (
-    <div>
-      <div>
-        <span>Username</span>
-        <input type="text" name="username" onChange={handleChange} />
-        <span>Password</span>
-        <input type="text" name="password" onChange={handleChange} />
-        <button onClick={handleLogin}>Giriş Yap</button>
-        {err && <span>{err}</span>}
+    <div className="min-h-lvh flex justify-center items-center">
+      <div className="bg-white shadow-xl rounded-2xl grid grid-cols-1 min-h-80 min-w-70 justify-center items-center  p-5 border ">
+        <div className="flex flex-col">
+          <span className="text-xs text-slate-500 font-semibold">
+            {t.username}
+          </span>
+          <input
+            className="border rounded-sm p-1 pl-2"
+            type="text"
+            name="username"
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <span className="text-xs text-slate-500 font-semibold">
+            {t.password}
+          </span>
+          <input
+            className="border rounded-sm p-1 pl-2"
+            type="password"
+            name="password"
+            onChange={handleChange}
+          />
+        </div>
+        <button
+          onClick={handleLogin}
+          className="bg-blue-500 text-white py-2 px-4 rounded-sm hover:bg-blue-600 cursor-pointer hover:shadow-md duration-200 active:scale-[0.99] active:shadow-sm"
+        >
+          {t.login}
+        </button>
+        {err && <span className="text-red-500">{err}</span>}
       </div>
     </div>
   );

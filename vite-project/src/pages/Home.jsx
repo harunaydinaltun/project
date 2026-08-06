@@ -3,27 +3,35 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/placeholders/logo_transparent.png";
 import { TR, GB } from "country-flag-icons/react/3x2";
+import RentalDatePicker from "../components/RentalDatePicker";
 
 export const Home = ({ t, setLang, lang }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const today = new Date().toISOString().split("T")[0];
 
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [pickUpDate, setPickUpDate] = useState("");
+  const [pickUpTime, setPickUpTime] = useState("10:00");
+
+  const [dropOffDate, setDropOffDate] = useState("");
+  const [dropOffTime, setDropOffTime] = useState("10:00");
+
   const handleSearch = (e) => {
     e.preventDefault();
 
-    if (!startDate || !endDate) {
+    if (!pickUpDate || !dropOffDate) {
       alert("tarihleri seçin");
       return;
     }
 
-    if (endDate < startDate) {
-      alert("bitiş başlangıçtan önce olamaz");
+    const startDate = `${pickUpDate}T${pickUpTime}`;
+    const endDate = `${dropOffDate}T${dropOffTime}`;
+
+    if (new Date(startDate) >= new Date(endDate)) {
+      alert("Bitiş tarihi başlangıç tarihinden önce olamaz");
       return;
     }
 
+    const totalDays = calculateTotalDays(startDate, endDate);
     navigate("/results", { state: { startDate, endDate, totalDays } });
   };
 
@@ -31,14 +39,15 @@ export const Home = ({ t, setLang, lang }) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const diffInTime = end.getTime() - start.getTime();
-    const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
+
+    const diffInHours = diffInTime / (1000 * 60 * 60);
+    const diffInDays = Math.ceil(diffInHours / 24);
 
     if (diffInDays < 0) return 0;
 
     return diffInDays;
   };
 
-  const totalDays = calculateTotalDays(startDate, endDate);
   return (
     <div className="min-h-screen w-full flex items-center justify-center  p-4">
       <div className="flex flex-col md:flex-row w-full max-w-sm md:max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden">
@@ -87,31 +96,17 @@ export const Home = ({ t, setLang, lang }) => {
               {t.searchCar || "Araç Ara"}
             </h2>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-slate-500">
-                {t.recieveDate || "Alış Tarihi"}
-              </label>
-              <input
-                type="date"
-                value={startDate}
-                min={today}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-slate-500">
-                {t.deliveryDate || "İade Tarihi"}
-              </label>
-              <input
-                type="date"
-                value={endDate}
-                min={startDate || today}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 transition-all [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-              />
-            </div>
+            <RentalDatePicker
+              t={t}
+              pickUpDate={pickUpDate}
+              setPickUpDate={setPickUpDate}
+              pickUpTime={pickUpTime}
+              setPickUpTime={setPickUpTime}
+              dropOffDate={dropOffDate}
+              setDropOffDate={setDropOffDate}
+              dropOffTime={dropOffTime}
+              setDropOffTime={setDropOffTime}
+            ></RentalDatePicker>
 
             <button
               type="submit"

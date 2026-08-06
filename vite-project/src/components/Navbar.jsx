@@ -22,7 +22,7 @@ export const Navbar = ({ t, setLang, lang }) => {
             <span className="mb-10">{t.logOutMessage}</span>
             <div className="flex justify-evenly">
               <button
-                className="bg-red-500 text-white p-2 rounded-lg ring-1 ring-slate-200 hover:cursor-pointer hover:scale-[0.99]"
+                className="bg-red-500 text-white p-2 rounded-lg ring-1 ring-slate-200 hover:cursor-pointer active:scale-[0.99]"
                 onClick={() => {
                   handleLogout();
                   setIsPopUpOpen(false);
@@ -31,7 +31,7 @@ export const Navbar = ({ t, setLang, lang }) => {
                 {t.logout}
               </button>
               <button
-                className="bg-slate-100 p-2 rounded-lg ring-1 ring-slate-200 hover:cursor-pointer hover:scale-[0.98]"
+                className="bg-slate-100 p-2 rounded-lg ring-1 ring-slate-200 hover:cursor-pointer active:scale-[0.98]"
                 onClick={() => {
                   setIsPopUpOpen(false);
                 }}
@@ -54,13 +54,13 @@ export const Navbar = ({ t, setLang, lang }) => {
         {!currentUser ? (
           <>
             <button
-              className="bg-slate-100 shadow-lg text-slate-600 font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-slate-50 transition-all p-1 hover:scale-[0.99] hover:cursor-pointer"
+              className="bg-slate-100 shadow-lg text-slate-600 font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-slate-50 transition-all p-1 active:scale-[0.99] hover:cursor-pointer"
               onClick={() => navigate("/register")}
             >
               {t.register}
             </button>
             <button
-              className="bg-green-500 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-green-500 transition-all p-1 hover:scale-[0.99] hover:cursor-pointer"
+              className="bg-green-500 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-green-500 transition-all p-1 active:scale-[0.99] hover:cursor-pointer"
               onClick={() => navigate("/login")}
             >
               {t.login}👤
@@ -72,13 +72,13 @@ export const Navbar = ({ t, setLang, lang }) => {
               {t.welcome}, {currentUser.username}
             </span>
             <button
-              className="bg-blue-600 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-blue-500 hover:bg-blue-700 transition-all duration-300 p-1 hover:scale-[0.98] hover:cursor-pointer"
+              className="bg-blue-600 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-blue-500 hover:bg-blue-700 transition-all duration-300 p-1 active:scale-[0.98] hover:cursor-pointer"
               onClick={() => navigate("/profile")}
             >
               {t.myProfile}👤
             </button>
             <button
-              className="bg-red-500 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-red-400 hover:bg-red-600 transition-all duration-300 p-1 hover:scale-[0.98] hover:cursor-pointer"
+              className="bg-red-500 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-red-400 hover:bg-red-600 transition-all duration-300 p-1 active:scale-[0.98] hover:cursor-pointer"
               onClick={() => {
                 setIsPopUpOpen(true);
               }}

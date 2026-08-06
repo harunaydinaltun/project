@@ -30,11 +30,11 @@ export const MinAgeFilterBox = ({ t, userAge, onFilterChange }) => {
             <input
               type="range"
               min="18"
-              max="75"
+              max="30"
               step="1"
               value={userAge}
               onChange={(e) => onFilterChange("userAge", e.target.value)}
-              className="w-full h-1.5 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-500"
+              className="w-full h-1.5 bg-slate-300 rounded-lg  cursor-pointer accent-blue-500"
             />
           </div>
         </div>

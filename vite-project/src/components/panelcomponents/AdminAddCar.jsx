@@ -13,14 +13,12 @@ export const AdminAddCar = () => {
   const [loading, setLoading] = useState(false);
   const [modelConfirmed, setModelConfirmed] = useState(false);
 
-  // Veriler
   const [brands, setBrands] = useState([]);
   const [modelNames, setModelNames] = useState([]);
   const [years, setYears] = useState([]);
   const [variants, setVariants] = useState([]);
   const [locations, setLocations] = useState([]);
 
-  // Seçimler
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
@@ -35,7 +33,6 @@ export const AdminAddCar = () => {
     color: "",
   });
 
-  // State Temizleyiciler
   const handleBrandChange = (e) => {
     setSelectedBrand(e.target.value);
     setSelectedModel("");
@@ -54,7 +51,6 @@ export const AdminAddCar = () => {
     setInputs((prev) => ({ ...prev, [name]: value }));
   };
 
-  // API Çağrıları
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -100,7 +96,6 @@ export const AdminAddCar = () => {
     }
   }, [page, selectedBrand, selectedModel, selectedYear]);
 
-  // Form Gönderimi
   const handleSubmitCar = async () => {
     if (!locationId) return alert("Şube seçimi zorunludur!");
     try {
@@ -116,7 +111,6 @@ export const AdminAddCar = () => {
       });
       alert("Araç başarıyla eklendi!");
 
-      // Her şeyi sıfırla
       setPage("brand");
       setSelectedBrand("");
       setSelectedModel("");

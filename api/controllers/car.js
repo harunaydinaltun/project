@@ -84,7 +84,7 @@ export const getAvailableCars = async (req, res) => {
   }
 
   if (userAge) {
-    baseQuery += ` AND models.minAge <= ?`;
+    baseQuery += ` AND models.minAge >= ?`;
     queryParams.push(Number(userAge));
   }
 
@@ -139,6 +139,7 @@ export const getCar = async (req, res) => {
       models.trim,
       models.engineSize,
       models.brand,
+      models.modelName,
       models.bodyType,
       models.doors,
       models.fuelType,
@@ -164,7 +165,6 @@ export const getCar = async (req, res) => {
   }
 };
 
-//DÜZENLE
 export const addCar = async (req, res) => {
   const { licensePlate, dailyPrice, deposit, locationId, color, modelId } =
     req.body;

@@ -87,7 +87,12 @@ export const AppContent = () => {
           path="/verify-email/:token"
           element={<VerifyEmailPage t={t} />}
         />
-        <Route path="/adminlogin/" element={<AdminLoginPage t={t} />} />
+        <Route
+          path="/adminlogin/"
+          element={
+            currentUser ? <Navigate to="/admin" /> : <AdminLoginPage t={t} />
+          }
+        />
         <Route
           path="/admin/"
           element={

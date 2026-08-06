@@ -43,7 +43,7 @@ export const LoginPage = ({ t }) => {
           src={logo}
           alt=""
         />
-        <span className="self- text-xs text-slate-500 font-semibold">
+        <span className=" text-xs text-slate-500 font-semibold">
           {t.username}
         </span>
         <input
@@ -72,7 +72,7 @@ export const LoginPage = ({ t }) => {
           {t.forgotYourPassword}
         </p>
         <button
-          className="place-self-center bg-green-500 hover:cursor-pointer text-shadow-sm rounded-sm max-w-30 p-2 transition-all duration-300 hover:scale-[0.99]"
+          className="place-self-center bg-green-500 hover:cursor-pointer text-shadow-sm rounded-sm max-w-30 p-2 transition-all duration-300 active:scale-[0.99]"
           onClick={handleLogin}
         >
           {t.login}
