@@ -1,18 +1,20 @@
 import { useState } from "react";
 
-export const FuelTypeFilterBox = ({
+export const GearTypeFilterBox = ({
   t,
-  fuelTypes = [],
+  gearTypes = [],
   filters,
   onFilterChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const selectedValues = filters?.fuelType || [];
+  const selectedValues = filters?.gearType || [];
 
   return (
-    <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg">
+    <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg duration-500">
       <div className="flex justify-evenly" onClick={() => setIsOpen(!isOpen)}>
-        <div className="pl-1 text-shadow-md">{t.fuelType || "Fuel Type"}</div>
+        <div className="pl-1 text-shadow-md font-semibold text-slate-700">
+          {t.gearType}
+        </div>
         <span
           className={`text-shadow-md text-xs transform duration-500 ${isOpen ? "rotate-x-180" : ""}`}
         >
@@ -24,13 +26,13 @@ export const FuelTypeFilterBox = ({
       >
         <div className="overflow-hidden">
           <div className="pt-2 flex flex-col gap-1">
-            {Array.isArray(fuelTypes) && fuelTypes.length > 0 ? (
-              fuelTypes.map((item) => {
+            {Array.isArray(gearTypes) && gearTypes.length > 0 ? (
+              gearTypes.map((item) => {
                 const isSelected = selectedValues.includes(item);
                 return (
                   <div
                     key={item}
-                    onClick={() => onFilterChange("fuelType", item)}
+                    onClick={() => onFilterChange("gearType", item)}
                     className={`text-shadow-md flex items-center p-1 gap-2 rounded cursor-pointer transition-colors hover:bg-slate-50 ${
                       isSelected
                         ? "bg-slate-50 ring-1 ring-slate-400 font-medium"
@@ -43,7 +45,7 @@ export const FuelTypeFilterBox = ({
                       onChange={() => {}}
                       className="form-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-                    <span className="text-xs">{t.fuelConstants[item]}</span>
+                    <span className="text-xs">{t.gearConstants[item]}</span>
                   </div>
                 );
               })
@@ -57,4 +59,4 @@ export const FuelTypeFilterBox = ({
   );
 };
 
-export default FuelTypeFilterBox;
+export default GearTypeFilterBox;

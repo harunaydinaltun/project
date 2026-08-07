@@ -4,10 +4,11 @@ export const getAvailableCars = async (req, res) => {
   const {
     startDate,
     endDate,
+    pickupLocationId,
+    returnLocationId,
     brand,
     modelName,
     color,
-    locationId,
     bodyType,
     doors,
     engineSize,
@@ -20,21 +21,60 @@ export const getAvailableCars = async (req, res) => {
     limit = 12,
   } = req.query;
 
-  if (!startDate || !endDate) {
+  if (!startDate || !endDate || !pickupLocationId || !returnLocationId) {
     return res
       .status(400)
-      .json({ message: "Başlangıç ve bitiş tarihleri zorunludur" });
+      .json({
+        message:
+          "Başlangıç tarihi, bitiş tarihi, alış ve teslim noktaları zorunludur",
+      });
   }
 
   let baseQuery = `
       FROM cars
       INNER JOIN models ON cars.modelId = models.id
-      LEFT JOIN rentals ON cars.id = rentals.car_id 
-      AND (rentals.end_date >= ? AND rentals.start_date <= ?)
-      WHERE rentals.id IS NULL
+      WHERE 
+        NOT EXISTS (
+            SELECT 1 
+            FROM rentals r 
+            WHERE r.car_id = cars.id 
+              AND r.start_date < ? 
+              AND r.end_date > ?
+        )
+        AND ? = COALESCE(
+            (
+                SELECT r.return_location_id 
+                FROM rentals r 
+                WHERE r.car_id = cars.id 
+                  AND r.end_date <= ?
+                ORDER BY r.end_date DESC, r.id DESC 
+                LIMIT 1
+            ), 
+            cars.locationId
+        )
+        AND ? = COALESCE(
+            (
+                SELECT r.pickup_location_id 
+                FROM rentals r 
+                WHERE r.car_id = cars.id 
+                  AND r.start_date >= ?
+                ORDER BY r.start_date ASC, r.id ASC 
+                LIMIT 1
+            ), 
+            ?
+        )
     `;
 
-  const queryParams = [startDate, endDate];
+  const queryParams = [
+    endDate,
+    startDate,
+    pickupLocationId,
+    startDate,
+    returnLocationId,
+    endDate,
+    returnLocationId,
+  ];
+
   const parseMultiple = (val) => val.split(",");
 
   if (color) {
@@ -48,10 +88,6 @@ export const getAvailableCars = async (req, res) => {
   if (brand) {
     baseQuery += ` AND models.brand IN (?)`;
     queryParams.push(parseMultiple(brand));
-  }
-  if (locationId) {
-    baseQuery += ` AND cars.locationId IN (?)`;
-    queryParams.push(parseMultiple(locationId));
   }
 
   if (bodyType) {
@@ -71,11 +107,11 @@ export const getAvailableCars = async (req, res) => {
     queryParams.push(parseMultiple(gearType));
   }
   if (trim) {
-    baseQuery += ` AND models.gearType IN (?)`;
+    baseQuery += ` AND models.trim IN (?)`;
     queryParams.push(parseMultiple(trim));
   }
   if (engineSize) {
-    baseQuery += ` AND models.gearType IN (?)`;
+    baseQuery += ` AND models.engineSize IN (?)`;
     queryParams.push(parseMultiple(engineSize));
   }
   if (maxPrice) {
@@ -166,12 +202,19 @@ export const getCar = async (req, res) => {
 };
 
 export const addCar = async (req, res) => {
-  const { licensePlate, dailyPrice, deposit, locationId, color, modelId } =
-    req.body;
+  const {
+    licensePlate,
+    dailyPrice,
+    deposit,
+    locationId,
+    color,
+    modelId,
+    kilometer,
+  } = req.body;
 
   const query = `
-    INSERT INTO cars (licensePlate, dailyPrice, deposit, locationId, color, modelId)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO cars (licensePlate, dailyPrice, deposit, locationId, color, modelId, kilometer)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 
   try {
@@ -182,6 +225,7 @@ export const addCar = async (req, res) => {
       locationId,
       color,
       modelId,
+      kilometer,
     ]);
     return res.status(201).json({ id: result.insertId });
   } catch (err) {

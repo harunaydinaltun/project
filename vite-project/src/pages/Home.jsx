@@ -15,6 +15,9 @@ export const Home = ({ t, setLang, lang }) => {
   const [dropOffDate, setDropOffDate] = useState("");
   const [dropOffTime, setDropOffTime] = useState("10:00");
 
+  const [pickUpLocation, setPickUpLocation] = useState("");
+  const [dropOffLocation, setDropOffLocation] = useState("");
+
   const handleSearch = (e) => {
     e.preventDefault();
 
@@ -32,7 +35,9 @@ export const Home = ({ t, setLang, lang }) => {
     }
 
     const totalDays = calculateTotalDays(startDate, endDate);
-    navigate("/results", { state: { startDate, endDate, totalDays } });
+    navigate("/results", {
+      state: { startDate, endDate, totalDays, pickUpLocation, dropOffLocation },
+    });
   };
 
   const calculateTotalDays = (startDate, endDate) => {
@@ -106,6 +111,10 @@ export const Home = ({ t, setLang, lang }) => {
               setDropOffDate={setDropOffDate}
               dropOffTime={dropOffTime}
               setDropOffTime={setDropOffTime}
+              pickUpLocation={pickUpLocation}
+              setPickUpLocation={setPickUpLocation}
+              dropOffLocation={dropOffLocation}
+              setDropOffLocation={setDropOffLocation}
             ></RentalDatePicker>
 
             <button

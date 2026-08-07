@@ -1,27 +1,34 @@
-import ColorFilterBox from "./ColorFilterBox";
-import BrandFilterBox from "./BrandFilterBox";
-import ModelFilterBox from "./ModelFilterBox";
-import BodyTypeFilterBox from "./BodyTypeFilterBox";
-import DoorsFilterBox from "./DoorsFilterBox";
-import FuelTypeFilterBox from "./FuelTypeFilterBox";
-import GearTypeFilterBox from "./GearTypeFilterBox";
-import MinAgeFilterBox from "./MinAgeFilterBox";
-import PriceFilterBox from "./PriceFilterBox";
+import BrandFilterBox from "./filtercomponents/BrandFilterBox";
+import ModelFilterBox from "./filtercomponents/ModelFilterBox";
+import TrimFilterBox from "./filtercomponents/TrimFilterBox";
+import EngineSizeFilterBox from "./filtercomponents/EngineSizeFilterBox";
+import ColorFilterBox from "./filtercomponents/ColorFilterBox";
+import BodyTypeFilterBox from "./filtercomponents/BodyTypeFilterBox";
+import DoorsFilterBox from "./filtercomponents/DoorsFilterBox";
+import FuelTypeFilterBox from "./filtercomponents/FuelTypeFilterBox";
+import GearTypeFilterBox from "./filtercomponents/GearTypeFilterBox";
+import MinAgeFilterBox from "./filtercomponents/MinAgeFilterBox";
+import PriceFilterBox from "./filtercomponents/PriceFilterBox";
+import DateAndLocationFilterBox from "./filtercomponents/DateAndLocationFilterBox";
 
 const SearchSideBar = ({
   t,
   filters,
   brands,
   models,
+  trims,
+  engineSizes,
   colors,
   bodyTypes,
   doors,
   fuelTypes,
   gearTypes,
   onFilterChange,
+  setIsPoppedUp,
 }) => {
   return (
     <div className="flex flex-col rounded-2xl max-w-40 max-h-fit bg-gray-100 p-3 ring-1 ring-slate-100 shadow-sm sticky top-3">
+      <DateAndLocationFilterBox setIsPoppedUp={setIsPoppedUp} />
       <BrandFilterBox
         t={t}
         brands={brands}
@@ -31,6 +38,18 @@ const SearchSideBar = ({
       <ModelFilterBox
         t={t}
         models={models}
+        filters={filters}
+        onFilterChange={onFilterChange}
+      />
+      <TrimFilterBox
+        t={t}
+        trims={trims}
+        filters={filters}
+        onFilterChange={onFilterChange}
+      />
+      <EngineSizeFilterBox
+        t={t}
+        engineSizes={engineSizes}
         filters={filters}
         onFilterChange={onFilterChange}
       />

@@ -4,6 +4,6 @@ import { verifyAdmin } from "../middleware/verifyAdmin.js";
 
 const router = express.Router();
 
-router.get("/", verifyAdmin, getAllLocations);
+router.get("/", getAllLocations);
 
 export default router;

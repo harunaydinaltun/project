@@ -1,4 +1,4 @@
-import { CAR_COLORS } from "../constants/carConstants.js";
+import { CAR_COLORS } from "../../constants/carConstants.js";
 import { useState } from "react";
 
 const ColorFilterBox = ({
@@ -13,14 +13,16 @@ const ColorFilterBox = ({
   const filteredCarColors = CAR_COLORS.filter((c) => colors.includes(c.name));
 
   return (
-    <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg ">
+    <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg duration-500 ">
       <div
         className="flex justify-evenly"
         onClick={() => {
           setIsOpen(!isOpen);
         }}
       >
-        <div className="pl-1 text-shadow-md">{t.color}</div>
+        <div className="pl-1 text-shadow-md font-semibold text-slate-700">
+          {t.color}
+        </div>
         <span
           className={`text-shadow-md text-xs transform duration-500 ${
             isOpen ? "rotate-x-180" : ""

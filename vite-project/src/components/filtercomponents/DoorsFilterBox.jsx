@@ -1,18 +1,15 @@
 import { useState } from "react";
 
-export const BodyTypeFilterBox = ({
-  t,
-  bodyTypes = [],
-  filters,
-  onFilterChange,
-}) => {
+export const DoorsFilterBox = ({ t, doors = [], filters, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const selectedValues = filters?.bodyType || [];
+  const selectedValues = filters?.doors || [];
 
   return (
-    <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg">
+    <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg duration-500">
       <div className="flex justify-evenly" onClick={() => setIsOpen(!isOpen)}>
-        <div className="pl-1 text-shadow-md">{t.bodyType}</div>
+        <div className="pl-1 text-shadow-md font-semibold text-slate-700">
+          {t.doors || "KAPI SAYISI"}
+        </div>
         <span
           className={`text-shadow-md text-xs transform duration-500 ${isOpen ? "rotate-x-180" : ""}`}
         >
@@ -24,13 +21,13 @@ export const BodyTypeFilterBox = ({
       >
         <div className="overflow-hidden">
           <div className="pt-2 flex flex-col gap-1">
-            {Array.isArray(bodyTypes) && bodyTypes.length > 0 ? (
-              bodyTypes.map((item) => {
+            {Array.isArray(doors) && doors.length > 0 ? (
+              doors.map((item) => {
                 const isSelected = selectedValues.includes(item);
                 return (
                   <div
                     key={item}
-                    onClick={() => onFilterChange("bodyType", item)}
+                    onClick={() => onFilterChange("doors", item)}
                     className={`text-shadow-md flex items-center p-1 gap-2 rounded cursor-pointer transition-colors hover:bg-slate-50 ${
                       isSelected
                         ? "bg-slate-50 ring-1 ring-slate-400 font-medium"
@@ -57,4 +54,4 @@ export const BodyTypeFilterBox = ({
   );
 };
 
-export default BodyTypeFilterBox;
+export default DoorsFilterBox;

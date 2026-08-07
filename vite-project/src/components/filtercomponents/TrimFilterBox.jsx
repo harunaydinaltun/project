@@ -1,38 +1,54 @@
 import { useState } from "react";
 
-export const BrandFilterBox = ({ t, brands = [], filters, onFilterChange }) => {
+export const TrimFilterBox = ({ t, trims = [], filters, onFilterChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const selectedBrands = filters?.brand || [];
+
+  const selectedModels = filters?.modelName || [];
+  const selectedTrims = filters?.trim || [];
+
+  const isDisabled = selectedModels.length === 0;
+
+  const handleToggle = () => {
+    if (isDisabled) return;
+    setIsOpen(!isOpen);
+  };
 
   return (
-    <div className="bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 cursor-pointer transition-all hover:shadow-lg">
-      <div className="flex justify-evenly" onClick={() => setIsOpen(!isOpen)}>
-        <div className="pl-1 text-shadow-md">{t.brand}</div>
+    <div
+      className={`bg-slate-200 ring-1 rounded-2xl  mt-1.5 p-2 ring-slate-300 max-w-40 transition-all ${
+        isDisabled
+          ? "opacity-50 cursor-not-allowed"
+          : "cursor-pointer hover:shadow-lg duration-500"
+      }`}
+    >
+      <div className="flex justify-evenly" onClick={handleToggle}>
+        <div className="pl-1 text-shadow-md font-semibold text-slate-700">
+          {t.trim || "Donanım"}
+        </div>
         <span
           className={`text-shadow-md text-xs transform duration-500 ${
-            isOpen ? "rotate-x-180" : ""
+            isOpen && !isDisabled ? "rotate-x-180" : ""
           }`}
         >
           ▼
         </span>
       </div>
+
       <div
         className={`grid transition-[grid-template-rows] duration-400 ease-in-out ${
-          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          isOpen && !isDisabled ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
       >
         <div className="overflow-hidden">
           <div className="pt-2 flex flex-col gap-1">
-            {Array.isArray(brands) && brands.length > 0 ? (
-              brands.map((brand) => {
-                const isSelected = selectedBrands.includes(brand);
+            {Array.isArray(trims) && trims.length > 0 ? (
+              trims.map((trim) => {
+                const isSelected = selectedTrims.includes(trim);
 
                 return (
                   <div
-                    key={brand}
-                    onClick={() => {
-                      onFilterChange("brand", brand);
-                    }}
+                    key={trim}
+                    onClick={() => onFilterChange("trim", trim)}
                     className={`text-shadow-md flex items-center p-1 gap-2 rounded cursor-pointer transition-colors hover:bg-slate-50 ${
                       isSelected
                         ? "bg-slate-50 ring-1 ring-slate-400 font-medium"
@@ -45,13 +61,13 @@ export const BrandFilterBox = ({ t, brands = [], filters, onFilterChange }) => {
                       onChange={() => {}}
                       className="form-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-                    <span className="text-xs">{brand}</span>
+                    <span className="text-xs">{trim}</span>
                   </div>
                 );
               })
             ) : (
               <span className="text-xs text-gray-500 pl-1">
-                Marka bulunamadı
+                {isDisabled ? "Önce model seçiniz" : "Donanım bulunamadı"}
               </span>
             )}
           </div>
@@ -61,4 +77,4 @@ export const BrandFilterBox = ({ t, brands = [], filters, onFilterChange }) => {
   );
 };
 
-export default BrandFilterBox;
+export default TrimFilterBox;

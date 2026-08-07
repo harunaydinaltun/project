@@ -15,14 +15,16 @@ export const ModelFilterBox = ({ t, models = [], filters, onFilterChange }) => {
 
   return (
     <div
-      className={`bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2 ring-slate-300 max-w-40 transition-all ${
+      className={`bg-slate-200 ring-1 rounded-2xl mt-1.5 p-2  ring-slate-300 max-w-40 transition-all ${
         isDisabled
           ? "opacity-50 cursor-not-allowed"
-          : "cursor-pointer hover:shadow-lg"
+          : "cursor-pointer hover:shadow-lg duration-500"
       }`}
     >
       <div className="flex justify-evenly" onClick={handleToggle}>
-        <div className="pl-1 text-shadow-md">{t.model || "MODEL"}</div>
+        <div className="pl-1 text-shadow-md font-semibold text-slate-700">
+          {t.model || "MODEL"}
+        </div>
         <span
           className={`text-shadow-md text-xs transform duration-500 ${
             isOpen && !isDisabled ? "rotate-x-180" : ""

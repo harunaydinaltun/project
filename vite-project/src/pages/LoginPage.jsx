@@ -1,10 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/placeholders/logo_transparent.png";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 
 export const LoginPage = ({ t }) => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -27,8 +28,31 @@ export const LoginPage = ({ t }) => {
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      login(res.data.user);
-      navigate("/");
+
+      if (location.state) {
+        const { car, startDate, endDate, pickUpLocation, dropOffLocation } =
+          location.state;
+
+        const queryParams = new URLSearchParams();
+
+        if (startDate) queryParams.append("startDate", startDate);
+        if (endDate) queryParams.append("endDate", endDate);
+        if (pickUpLocation)
+          queryParams.append("pickUpLocation", pickUpLocation);
+        if (dropOffLocation)
+          queryParams.append("dropOffLocation", dropOffLocation);
+
+        navigate(`/cars/${car.car_id || car.id}?${queryParams.toString()}`, {
+          replace: true,
+          state: { car, startDate, endDate, pickUpLocation, dropOffLocation },
+        });
+      } else {
+        navigate("/");
+      }
+
+      setTimeout(() => {
+        login(res.data.user);
+      }, 50);
     } catch (error) {
       console.log(error.message);
       setErr(t.error);

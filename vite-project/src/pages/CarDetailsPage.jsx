@@ -1,41 +1,36 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import api from "../utils/api";
-import { RentalDatePicker } from "../components/RentalDatePicker";
 
 export const CarDetailsPage = () => {
+  const { currentUser, logout } = useAuth();
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isPopped, setIsPopped] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  const [loginPage, setLoginPage] = useState(false);
+
+  const startDate = searchParams.get("startDate") || location.state?.startDate;
+  const endDate = searchParams.get("endDate") || location.state?.endDate;
+  const pickUpLocation =
+    searchParams.get("pickUpLocation") || location.state?.pickUpLocation;
+  const dropOffLocation =
+    searchParams.get("dropOffLocation") || location.state?.dropOffLocation;
 
   const passedCar = location.state?.car;
-  const passedStartDate = location.state?.startDate;
-  const passedEndDate = location.state?.endDate;
-
-  const splitDateTime = (dateTimeStr) => {
-    if (!dateTimeStr) return { date: "", time: "10:00" };
-    const [date, time] = dateTimeStr.split("T");
-    return { date, time: time ? time.substring(0, 5) : "10:00" };
-  };
-
-  const initStart = splitDateTime(passedStartDate);
-  const initEnd = splitDateTime(passedEndDate);
-
   const [car, setCar] = useState(passedCar || null);
   const [loading, setLoading] = useState(!passedCar);
   const [error, setError] = useState(null);
 
-  const [pickUpDate, setPickUpDate] = useState(initStart.date);
-  const [pickUpTime, setPickUpTime] = useState(initStart.time);
-  const [dropOffDate, setDropOffDate] = useState(initEnd.date);
-  const [dropOffTime, setDropOffTime] = useState(initEnd.time);
-
-  const isDateValid = pickUpDate && dropOffDate;
-  const startDate = isDateValid ? `${pickUpDate}T${pickUpTime}` : "";
-  const endDate = isDateValid ? `${dropOffDate}T${dropOffTime}` : "";
-
+  const isDateValid = startDate && endDate;
   let totalPrice = 0;
   let daysDiff = 0;
 
@@ -134,12 +129,13 @@ export const CarDetailsPage = () => {
             </h2>
 
             {!isDateValid || daysDiff <= 0 ? (
-              <div className="flex flex-col items-center my-2 p-3 bg-amber-100 border border-amber-300 text-amber-800 rounded-lg shadow-sm">
+              <div className="flex flex-col items-center my-2 p-3 bg-red-100 border border-red-300 text-red-800 rounded-lg shadow-sm">
                 <span className="font-semibold text-center">
-                  Lütfen Aşağıdan Tarih Seçiniz
+                  Geçerli bir kiralama aralığı bulunamadı!
                 </span>
-                <span className="text-xs text-center mt-1">
-                  Fiyat hesaplaması için tarih gereklidir.
+                <span className="text-sm text-center mt-1">
+                  Güvenliğiniz ve araç müsaitliği için lütfen ana sayfadan tarih
+                  seçerek arama yapın.
                 </span>
               </div>
             ) : (
@@ -149,6 +145,12 @@ export const CarDetailsPage = () => {
                 </span>
                 <span>
                   <b>İade:</b> {endDate.replace("T", " ")}
+                </span>
+                <span>
+                  <b>Alış Şubesi:</b> {pickUpLocation}
+                </span>
+                <span>
+                  <b>İade Şubesi:</b> {dropOffLocation}
                 </span>
                 <span>
                   <b>Toplam Süre:</b> {daysDiff} Gün
@@ -168,56 +170,56 @@ export const CarDetailsPage = () => {
             <span>
               <b>Min. Yaş:</b> {car.minAge}
             </span>
-            <span>
-              <b>Alış Noktası:</b> {car.locationId}
-            </span>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full mt-4">
-          <button
-            className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 px-4 rounded-lg cursor-pointer transition-transform active:scale-[0.98] ring-1 ring-slate-300 duration-200"
-            onClick={() => setIsPopped(true)}
-          >
-            Tarihleri Belirle
-          </button>
-          <button
-            disabled={!isDateValid || daysDiff <= 0}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg cursor-pointer transition-transform active:scale-[0.98] ring-1 ring-blue-700 duration-200 disabled:opacity-50 disabled:pointer-events-none"
-            onClick={() => navigate("/checkout")}
-          >
-            Kiralamaya Devam Et
-          </button>
+        <div className="flex gap-3 w-full mt-4">
+          {!isDateValid || daysDiff <= 0 ? (
+            <button
+              className="flex-1 bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-lg cursor-pointer transition-transform active:scale-[0.98] duration-200"
+              onClick={() => navigate("/")}
+            >
+              Ana Sayfaya Dön ve Ara
+            </button>
+          ) : currentUser ? (
+            <button
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg cursor-pointer transition-transform active:scale-[0.98] ring-1 ring-blue-700 duration-200"
+              onClick={() =>
+                navigate("/checkout", {
+                  state: {
+                    car,
+                    startDate,
+                    endDate,
+                    pickUpLocation,
+                    dropOffLocation,
+                    daysDiff,
+                    totalPrice,
+                  },
+                })
+              }
+            >
+              Kiralamaya Devam Et
+            </button>
+          ) : (
+            <button
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg cursor-pointer transition-transform active:scale-[0.98] ring-1 ring-green-700 duration-200"
+              onClick={() =>
+                navigate("/login", {
+                  state: {
+                    car,
+                    startDate,
+                    endDate,
+                    pickUpLocation,
+                    dropOffLocation,
+                  },
+                })
+              }
+            >
+              Devam Etmek İçin Giriş Yap
+            </button>
+          )}
         </div>
       </div>
-
-      {isPopped && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm">
-            <h2 className="text-xl font-bold mb-4 text-slate-800 border-b pb-2">
-              Tarihleri Değiştir
-            </h2>
-
-            <RentalDatePicker
-              pickUpDate={pickUpDate}
-              setPickUpDate={setPickUpDate}
-              pickUpTime={pickUpTime}
-              setPickUpTime={setPickUpTime}
-              dropOffDate={dropOffDate}
-              setDropOffDate={setDropOffDate}
-              dropOffTime={dropOffTime}
-              setDropOffTime={setDropOffTime}
-            />
-
-            <button
-              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg cursor-pointer transition-transform active:scale-[0.98] duration-200"
-              onClick={() => setIsPopped(false)}
-            >
-              Kaydet ve Kapat
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

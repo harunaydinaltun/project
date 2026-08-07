@@ -22,6 +22,7 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminPanelPage from "./pages/AdminPanelPage";
 import { AdminRoute } from "./components/panelcomponents/AdminRoute";
+import Checkoutpage from "./pages/Checkoutpage";
 
 const getSystemLanguage = () => {
   const browserLang = navigator.language || navigator.userLanguage || "";
@@ -54,31 +55,35 @@ export const AppContent = () => {
         <Route
           path="/"
           element={<Home t={t} setLang={setLang} lang={lang} />}
-        ></Route>
-        <Route path="/test" element={<Test t={t} />}></Route>
+        />
+        <Route path="/test" element={<Test t={t} />} />
         <Route
           path="/profile"
           element={
             currentUser ? <ProfilePage t={t} /> : <Navigate to="/login" />
           }
-        ></Route>
-        <Route path="/results" element={<ResultsPage t={t} />}></Route>
-        <Route path="/cars/:id" element={<CarDetailsPage t={t} />}></Route>
+        />
+        <Route path="/results" element={<ResultsPage t={t} />} />
+        <Route path="/cars/:id" element={<CarDetailsPage t={t} />} />
+        <Route
+          path="checkout"
+          element={currentUser ? <Checkoutpage /> : <Navigate to="/login" />}
+        />
 
-        <Route path="/details/" element={<CarDetailsPage t={t} />}></Route>
+        <Route path="/details/" element={<CarDetailsPage t={t} />} />
 
         <Route
           path="/register/"
           element={currentUser ? <Navigate to="/" /> : <RegisterPage t={t} />}
-        ></Route>
+        />
         <Route
           path="/login/"
           element={currentUser ? <Navigate to="/" /> : <LoginPage t={t} />}
-        ></Route>
+        />
         <Route
           path="/forgot-password/"
           element={<ForgotPasswordPage t={t} />}
-        ></Route>
+        />
         <Route
           path="/reset-password/:token"
           element={<ResetPasswordPage t={t} />}

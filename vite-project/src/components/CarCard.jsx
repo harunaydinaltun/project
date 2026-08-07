@@ -1,9 +1,23 @@
 import { useNavigate } from "react-router-dom";
 
-export const CarCard = ({ t, car, totalDays, startDate, endDate }) => {
+export const CarCard = ({
+  t,
+  car,
+  totalDays,
+  startDate,
+  endDate,
+  pickUpLocation,
+  dropOffLocation,
+}) => {
   const navigate = useNavigate();
   const handleViewDetails = () => {
-    navigate(`/cars/${car.car_id}`, {
+    const queryParams = new URLSearchParams();
+    if (startDate) queryParams.append("startDate", startDate);
+    if (endDate) queryParams.append("endDate", endDate);
+    if (pickUpLocation) queryParams.append("pickUpLocation", pickUpLocation);
+    if (dropOffLocation) queryParams.append("dropOffLocation", dropOffLocation);
+
+    navigate(`/cars/${car.car_id}?${queryParams.toString()}`, {
       state: { car, totalDays, startDate, endDate },
     });
   };

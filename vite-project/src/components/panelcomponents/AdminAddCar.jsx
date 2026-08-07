@@ -109,6 +109,7 @@ export const AdminAddCar = () => {
         deposit: Number(inputs.deposit),
         kilometer: Number(inputs.kilometer),
       });
+
       alert("Araç başarıyla eklendi!");
 
       setPage("brand");
