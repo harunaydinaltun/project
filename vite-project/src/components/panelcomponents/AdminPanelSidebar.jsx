@@ -1,25 +1,38 @@
 export const AdminPanelSidebar = ({ setActiveTab }) => {
   return (
-    <div className="flex flex-col justify-center max-w-40 bg-slate-200 border rounded-sm mt-1 shadow-lg max-h-40 ">
-      <div
-        className="border-b hover:bg-slate-300 cursor-pointer active:scale-[0.99] duration-150 p-1"
+    <aside className="flex flex-col w-64 bg-white border border-slate-200 rounded-xl shadow-md overflow-hidden p-2 gap-y-1 mt-1">
+      <button
+        type="button"
+        className="w-full text-left px-4 py-3 rounded-lg text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900 active:scale-[0.99] transition-all duration-150 cursor-pointer"
         onClick={() => setActiveTab("branches")}
       >
-        <span className="text-xl text-shadow-2xs">Şubeleri Görüntüle</span>
-      </div>
-      <div
-        className="border-b hover:bg-slate-300 cursor-pointer active:scale-[0.99] duration-150 p-1"
+        Şubeleri Görüntüle
+      </button>
+
+      <button
+        type="button"
+        className="w-full text-left px-4 py-3 rounded-lg text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900 active:scale-[0.99] transition-all duration-150 cursor-pointer"
         onClick={() => setActiveTab("addcars")}
       >
-        <span className="text-xl text-shadow-2xs">Fiziksel Araba Ekle</span>
-      </div>
-      <div
-        className=" hover:bg-slate-300 cursor-pointer active:scale-[0.99] duration-150 p-1"
+        Fiziksel Araba Ekle
+      </button>
+
+      <button
+        type="button"
+        className="w-full text-left px-4 py-3 rounded-lg text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900 active:scale-[0.99] transition-all duration-150 cursor-pointer"
         onClick={() => setActiveTab("addmodels")}
       >
-        <span className="text-xl text-shadow-2xs">Model Ekle</span>
-      </div>
-    </div>
+        Model Ekle
+      </button>
+
+      <button
+        type="button"
+        className="w-full text-left px-4 py-3 rounded-lg text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900 active:scale-[0.99] transition-all duration-150 cursor-pointer"
+        onClick={() => setActiveTab("showmodels")}
+      >
+        Modelleri Görüntüle
+      </button>
+    </aside>
   );
 };
 

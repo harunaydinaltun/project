@@ -22,7 +22,9 @@ import VerifyEmailPage from "./pages/VerifyEmailPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminPanelPage from "./pages/AdminPanelPage";
 import { AdminRoute } from "./components/panelcomponents/AdminRoute";
-import Checkoutpage from "./pages/Checkoutpage";
+import CheckoutPage from "./pages/CheckoutPage";
+import ProfileRentals from "./pages/ProfileRentals";
+import ProfileSettings from "./pages/ProfileSettings";
 
 const getSystemLanguage = () => {
   const browserLang = navigator.language || navigator.userLanguage || "";
@@ -63,11 +65,23 @@ export const AppContent = () => {
             currentUser ? <ProfilePage t={t} /> : <Navigate to="/login" />
           }
         />
+        <Route
+          path="/profile/rentals"
+          element={
+            currentUser ? <ProfileRentals t={t} /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/profile/settings"
+          element={
+            currentUser ? <ProfileSettings t={t} /> : <Navigate to="/login" />
+          }
+        />
         <Route path="/results" element={<ResultsPage t={t} />} />
         <Route path="/cars/:id" element={<CarDetailsPage t={t} />} />
         <Route
           path="checkout"
-          element={currentUser ? <Checkoutpage /> : <Navigate to="/login" />}
+          element={currentUser ? <CheckoutPage /> : <Navigate to="/login" />}
         />
 
         <Route path="/details/" element={<CarDetailsPage t={t} />} />

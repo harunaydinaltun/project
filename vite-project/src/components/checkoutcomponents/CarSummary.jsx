@@ -1,7 +1,7 @@
-export const CarSummary = ({ car, daysDiff, totalPrice }) => {
+export const CarSummary = ({ car }) => {
   return (
-    <div className="bg-slate-200">
-      <div className="flex flex-col p-2 justify-center items-center bg-slate-50 rounded-2xl min-w-60 max-w-60">
+    <div className="">
+      <div className="flex flex-col p-2 justify-center items-center bg-slate-50 rounded-2xl ">
         <img
           src={
             new URL(

@@ -8,7 +8,7 @@ export const AdminLoginPage = ({ t }) => {
   const { login } = useAuth();
 
   const [inputs, setInputs] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -39,12 +39,12 @@ export const AdminLoginPage = ({ t }) => {
       <div className="bg-white shadow-xl rounded-2xl grid grid-cols-1 min-h-80 min-w-70 justify-center items-center  p-5 border ">
         <div className="flex flex-col">
           <span className="text-xs text-slate-500 font-semibold">
-            {t.username}
+            {t.email}
           </span>
           <input
             className="border rounded-sm p-1 pl-2"
             type="text"
-            name="username"
+            name="email"
             onChange={handleChange}
           />
         </div>

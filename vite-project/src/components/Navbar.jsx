@@ -13,16 +13,19 @@ export const Navbar = ({ t, setLang, lang }) => {
     logout();
     navigate("/");
   };
-
   return (
-    <div className="bg-linear-to-b from-cyan-600 to-cyan-700 flex justify-between min-h-10 rounded-b-lg ring-1 ring-cyan-600 shadow-2xs">
+    <header className="bg-linear-to-r from-cyan-700 via-cyan-600 to-cyan-700 shadow-md sticky top-0 z-40 px-4 py-2.5 flex justify-between items-center rounded-b-2xl border-b border-cyan-500/30">
       {isPopUpOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md">
-          <div className="flex flex-col bg-slate-50 w-fit h-fit rounded-2xl p-15">
-            <span className="mb-10">{t.logOutMessage}</span>
-            <div className="flex justify-evenly">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+          <div className="flex flex-col bg-white w-full max-w-sm rounded-3xl shadow-2xl p-6 text-center">
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">
+              Çıkış Yap
+            </h3>
+            <p className="text-sm text-slate-600 mb-6">{t.logOutMessage}</p>
+            <div className="flex justify-center gap-3">
               <button
-                className="bg-red-500 text-white p-2 rounded-lg ring-1 ring-slate-200 hover:cursor-pointer active:scale-[0.99]"
+                type="button"
+                className="flex-1 bg-red-500 text-white font-medium py-2.5 px-4 rounded-xl hover:bg-red-600 active:scale-95 transition-all cursor-pointer shadow-sm"
                 onClick={() => {
                   handleLogout();
                   setIsPopUpOpen(false);
@@ -31,7 +34,8 @@ export const Navbar = ({ t, setLang, lang }) => {
                 {t.logout}
               </button>
               <button
-                className="bg-slate-100 p-2 rounded-lg ring-1 ring-slate-200 hover:cursor-pointer active:scale-[0.98]"
+                type="button"
+                className="flex-1 bg-slate-100 text-slate-700 font-medium py-2.5 px-4 rounded-xl hover:bg-slate-200 active:scale-95 transition-all cursor-pointer"
                 onClick={() => {
                   setIsPopUpOpen(false);
                 }}
@@ -42,46 +46,64 @@ export const Navbar = ({ t, setLang, lang }) => {
           </div>
         </div>
       )}
-      <img
-        className="w-15 h-15 ml-2 hover:cursor-pointer"
-        src={logo}
-        alt="logo"
-        onClick={() => {
-          navigate("/");
-        }}
-      />
-      <div className="flex gap-1 items-center">
+
+      <div
+        className="flex items-center cursor-pointer group"
+        onClick={() => navigate("/")}
+      >
+        <img
+          className="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-105"
+          src={logo}
+          alt="logo"
+        />
+      </div>
+
+      <div className="flex items-center gap-3">
         {!currentUser ? (
-          <>
+          <div className="flex items-center gap-2">
             <button
-              className="bg-slate-100 shadow-lg text-slate-600 font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-slate-50 transition-all p-1 active:scale-[0.99] hover:cursor-pointer"
+              type="button"
+              className="bg-white/10 hover:bg-white/20 text-white font-medium px-4 py-2 rounded-xl text-sm backdrop-blur-sm border border-white/25 transition-all active:scale-95 cursor-pointer shadow-sm"
               onClick={() => navigate("/register")}
             >
               {t.register}
             </button>
             <button
-              className="bg-green-500 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-green-500 transition-all p-1 active:scale-[0.99] hover:cursor-pointer"
+              type="button"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-xl text-sm transition-all active:scale-95 cursor-pointer shadow-md shadow-emerald-900/10"
               onClick={() => navigate("/login")}
             >
-              {t.login}👤
+              {t.login}
             </button>
-          </>
+          </div>
         ) : (
-          <div className="flex gap-2 mr-2">
-            <span className="text-white font-semibold text-sm self-center">
-              {t.welcome}, {currentUser.username}
+          <div className="flex items-center gap-3">
+            <span className="text-white/90 font-medium text-sm hidden sm:inline-block">
+              {t.welcome},{" "}
+              <span className="font-semibold text-white">
+                {currentUser.name}
+              </span>
             </span>
+            {currentUser.role === "admin" && (
+              <button
+                type="button"
+                className="bg-purple-800 hover:bg-purple-900 text-white font-medium px-4 py-2 rounded-xl text-sm transition-all active:scale-95 cursor-pointer shadow-sm duration-200"
+                onClick={() => navigate("/admin")}
+              >
+                PANEL
+              </button>
+            )}
             <button
-              className="bg-blue-600 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-blue-500 hover:bg-blue-700 transition-all duration-300 p-1 active:scale-[0.98] hover:cursor-pointer"
+              type="button"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl text-sm transition-all active:scale-95 cursor-pointer shadow-sm duration-200"
               onClick={() => navigate("/profile")}
             >
-              {t.myProfile}👤
+              {t.myProfile}
             </button>
             <button
-              className="bg-red-500 shadow-lg text-white font-semibold h-2/3 rounded-sm text-sm text-shadow-xs ring-1 ring-red-400 hover:bg-red-600 transition-all duration-300 p-1 active:scale-[0.98] hover:cursor-pointer"
-              onClick={() => {
-                setIsPopUpOpen(true);
-              }}
+              type="button"
+              className="bg-red-500/90 hover:bg-red-600 text-white font-medium px-3.5 py-2 rounded-xl text-sm transition-all active:scale-95 cursor-pointer shadow-sm duration-200"
+              onClick={() => setIsPopUpOpen(true)}
             >
               {t.logout}
             </button>
@@ -89,14 +111,22 @@ export const Navbar = ({ t, setLang, lang }) => {
         )}
 
         <button
-          className="h-2/3 w-8 hover:bg-cyan-600 rounded-xl transition-all duration-300 p-1 hover:cursor-pointer"
+          type="button"
+          className="w-9 h-9 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-xl border border-white/25 transition-all active:scale-95 cursor-pointer p-1.5 shadow-sm ml-1"
           onClick={() => {
-            lang === "tr" ? setLang("en") : setLang("tr");
+            setLang(lang === "tr" ? "en" : "tr");
           }}
+          title="Dil Değiştir / Change Language"
         >
-          {lang === "tr" ? <TR /> : <GB />}
+          {lang === "tr" ? (
+            <TR className="rounded-sm shadow-xs" />
+          ) : (
+            <GB className="rounded-sm shadow-xs" />
+          )}
         </button>
       </div>
-    </div>
+    </header>
   );
 };
+
+export default Navbar;

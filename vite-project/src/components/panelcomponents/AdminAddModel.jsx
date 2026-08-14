@@ -5,8 +5,9 @@ import {
   BODY_TYPES,
 } from "../../constants/carConstants.js";
 import api from "../../utils/api.js";
+import { AiFillWarning } from "react-icons/ai";
 
-export const AdminAddModel = () => {
+export const AdminAddModel = ({ setActiveTab }) => {
   const [inputs, setInputs] = useState({
     brand: "",
     modelName: "",
@@ -20,6 +21,7 @@ export const AdminAddModel = () => {
     minAge: "",
   });
 
+  const [showModelsModal, setShowModelModal] = useState(true);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -245,6 +247,35 @@ export const AdminAddModel = () => {
         <span className="text-green-600 text-[13px] flex justify-center">
           {message}
         </span>
+      )}
+      {showModelsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md">
+          <div className="flex flex-col bg-slate-50 w-fit h-fit rounded-2xl p-15 justify-center items-center">
+            <div className="text-red-600">
+              <AiFillWarning size={40} />
+            </div>
+            <span className="text-xl text-slate-800 font-semibold">
+              Yeni bir model eklemeden önce mevcut modelleri görüntülemeniz
+              tavsiye edilir
+            </span>
+            <div className="flex gap-x-3 w-3/4 justify-evenly mt-3">
+              <button
+                className="flex-1 text-lg bg-blue-600 text-slate-100 p-2 rounded-xl font-semibold ring ring-blue-500 hover:bg-blue-700 active:scale-[0.99] duration-200 cursor-pointer"
+                onClick={() => setActiveTab("showmodels")}
+              >
+                Modelleri Görüntüle
+              </button>
+              <button
+                className="flex-1 text-lg bg-slate-400 text-slate-50 p-2 rounded-xl font-semibold ring ring-slate-300 hover:bg-slate-500 active:scale-[0.99] duration-200 cursor-pointer"
+                onClick={() => {
+                  setShowModelModal(false);
+                }}
+              >
+                Devam Et
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

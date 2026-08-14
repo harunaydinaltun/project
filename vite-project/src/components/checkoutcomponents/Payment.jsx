@@ -1,15 +1,50 @@
-import { useState } from "react";
 import Packet from "./paymentsteps/Packet";
 import Extra from "./paymentsteps/Extra";
 import Credit from "./paymentsteps/Credit";
+import Confirm from "./paymentsteps/Confirm";
 
-export const Payment = () => {
-  const [step, setStep] = useState("credit");
+export const Payment = ({
+  step,
+  daysDiff,
+  packets,
+  extras,
+  setSelectedPacket,
+  selectedPacket,
+  setSelectedExtras,
+  selectedExtras,
+  customerInfo,
+  setCustomerInfo,
+  cardInfo,
+  setCardInfo,
+  rentalId,
+}) => {
   return (
     <div>
-      {step === "packet" && <Packet setStep={setStep} />}
-      {step === "extra" && <Extra setStep={setStep} />}
-      {step === "credit" && <Credit setStep={setStep} />}
+      {step === "packet" && (
+        <Packet
+          daysDiff={daysDiff}
+          packets={packets}
+          setSelectedPacket={setSelectedPacket}
+          selectedPacket={selectedPacket}
+        />
+      )}
+      {step === "extra" && (
+        <Extra
+          extras={extras}
+          daysDiff={daysDiff}
+          selectedExtras={selectedExtras}
+          setSelectedExtras={setSelectedExtras}
+        />
+      )}
+      {step === "credit" && (
+        <Credit
+          customerInfo={customerInfo}
+          setCustomerInfo={setCustomerInfo}
+          cardInfo={cardInfo}
+          setCardInfo={setCardInfo}
+        />
+      )}
+      {step === "confirm" && <Confirm rentalId={rentalId} />}
     </div>
   );
 };

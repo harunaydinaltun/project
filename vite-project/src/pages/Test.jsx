@@ -1,10 +1,9 @@
-import SearchSideBar from "../components/SearchSideBar";
+import SearchSideBar from "../components/checkoutcomponents/paymentsteps/Confirm";
 
-export const Test = ({ t }) => {
+export const Test = () => {
   return (
     <div>
-      TEST
-      <SearchSideBar t={t}></SearchSideBar>
+      <SearchSideBar></SearchSideBar>
     </div>
   );
 };

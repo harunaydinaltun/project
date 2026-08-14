@@ -11,10 +11,10 @@ export const CustomInput = ({
   maxLength,
 }) => {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col max-w-full min-w-1/2">
       <span className="text-xs text-slate-500 font-semibold mb-1">{label}</span>
       <input
-        className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+        className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         type={type}
         name={name}
         value={value}
@@ -38,3 +38,5 @@ export const CustomInput = ({
     </div>
   );
 };
+
+export default CustomInput;

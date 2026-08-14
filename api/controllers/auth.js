@@ -5,18 +5,9 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 
 export const register = async (req, res) => {
-  const { username, password, tel_no, email, birthdate, name, surname } =
-    req.body;
+  const { password, tel_no, email, birthdate, name, surname } = req.body;
 
-  if (
-    !username ||
-    !password ||
-    !email ||
-    !birthdate ||
-    !name ||
-    !surname ||
-    !tel_no
-  ) {
+  if (!password || !email || !birthdate || !name || !surname || !tel_no) {
     return res.status(400).json({ error: "Please fill all fields." });
   }
 
@@ -29,7 +20,7 @@ export const register = async (req, res) => {
   if (/[!-/]+/.test(surname) || surname.length > 45) {
     return res
       .status(400)
-      .json({ error: "Name field can not contain special chars." });
+      .json({ error: "Surname field can not contain special chars." });
   }
 
   if (
@@ -74,37 +65,26 @@ export const register = async (req, res) => {
   if (age < 18) {
     return res.status(400).json({ error: "You must be at least 18 years old" });
   }
-
-  if (
-    /[!-/]+/.test(username) ||
-    (username.length > 0 && /\s/.test(username)) ||
-    username.length > 30
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Username can not contain special chars or spaces" });
-  }
-
+  const connection = await db.getConnection();
   try {
-    const [existingUser] = await db.query(
-      "SELECT * FROM customers WHERE username = ? OR email = ?",
-      [username, email],
+    const [existingUser] = await connection.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email],
     );
 
     if (existingUser.length > 0) {
-      return res
-        .status(400)
-        .json({ error: "Username or E-mail adress is already taken!" });
+      connection.release();
+      return res.status(400).json({ error: "E-mail adress is already taken!" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const verificationToken = crypto.randomBytes(32).toString("hex");
 
-    const [result] = await db.query(
-      "INSERT INTO customers (username, password, tel_no, email, birthdate, name, surname, verification_token) VALUES (?,?,?,?,?,?,?,?)",
+    await connection.beginTransaction();
+
+    const [result] = await connection.query(
+      "INSERT INTO users (password, tel_no, email, birthdate, name, surname, verification_token) VALUES (?,?,?,?,?,?,?)",
       [
-        username,
         hashedPassword,
         tel_no,
         email,
@@ -114,6 +94,13 @@ export const register = async (req, res) => {
         verificationToken,
       ],
     );
+
+    const userId = result.insertId;
+    await connection.query("INSERT INTO customers (user_id) VALUES (?)", [
+      userId,
+    ]);
+
+    await connection.commit();
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -140,29 +127,34 @@ export const register = async (req, res) => {
 
     res.status(201).json({ message: "User has been created succesfuly!" });
   } catch (error) {
+    await connection.rollback();
     console.error(error);
     res.status(500).json({ error: "Server error" });
+  } finally {
+    connection.release;
   }
 };
 
 export const login = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
   try {
     const [users] = await db.query(
-      "SELECT * FROM customers WHERE username = ?",
-      [username],
+      "SELECT u.* FROM users u INNER JOIN customers c ON u.id = c.user_id WHERE u.email = ?",
+      [email],
     );
 
     if (users.length === 0) {
-      return res.status(404).json({ error: "User not found!" });
+      return res
+        .status(404)
+        .json({ error: "User not found or you are not a customer!" });
     }
 
     const user = users[0];
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ error: "Wrong username or password" });
+      return res.status(400).json({ error: "Wrong email or password" });
     }
 
     if (user.is_verified === 0) {
@@ -176,7 +168,11 @@ export const login = async (req, res) => {
       expiresIn: "24h",
     });
 
-    const { password: userPassword, ...otherDetails } = user;
+    const {
+      password: userPassword,
+      verification_token,
+      ...otherDetails
+    } = user;
 
     res.status(200).json({
       message: "Login succesful!",
@@ -201,9 +197,10 @@ export const forgotPassword = async (req, res) => {
   }
 
   try {
-    const [users] = await db.query("SELECT * FROM customers WHERE email = ?", [
+    const [users] = await db.query("SELECT * FROM users WHERE email = ?", [
       email,
     ]);
+
     if (users.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -284,10 +281,9 @@ export const resetPassword = async (req, res) => {
     }
 
     const email = resets[0].email;
-
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    await db.query("UPDATE customers SET password = ? WHERE email = ?", [
+    await db.query("UPDATE users SET password = ? WHERE email = ?", [
       hashedPassword,
       email,
     ]);
@@ -307,7 +303,7 @@ export const verifyEmail = async (req, res) => {
 
   try {
     const [users] = await db.query(
-      "SELECT * FROM customers WHERE verification_token = ?",
+      "SELECT * FROM users WHERE verification_token = ?",
       [token],
     );
 
@@ -327,7 +323,7 @@ export const verifyEmail = async (req, res) => {
       try {
         attempt++;
         await db.query(
-          "UPDATE customers SET is_verified = 1, verification_token = NULL WHERE id = ?",
+          "UPDATE users SET is_verified = 1, verification_token = NULL WHERE id = ?",
           [user.id],
         );
         isUpdated = true;
@@ -336,7 +332,6 @@ export const verifyEmail = async (req, res) => {
           `Güncelleme denemesi ${attempt} başarısız: `,
           updateError,
         );
-
         if (attempt === maxAttempts) {
           throw updateError;
         }
@@ -361,12 +356,13 @@ export const verifyEmail = async (req, res) => {
 };
 
 export const adminLogin = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
   try {
-    const [admins] = await db.query("SELECT * FROM admins WHERE username = ?", [
-      username,
-    ]);
+    const [admins] = await db.query(
+      "SELECT u.*, a.role FROM users u INNER JOIN admins a ON u.id = a.user_id WHERE u.email = ?",
+      [email],
+    );
 
     if (admins.length === 0) {
       return res.status(404).json({ error: "Admin not found!" });
@@ -376,7 +372,7 @@ export const adminLogin = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, admin.password);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ error: "Wrong username or password" });
+      return res.status(400).json({ error: "Wrong email or password" });
     }
 
     const token = jwt.sign(
@@ -385,7 +381,11 @@ export const adminLogin = async (req, res) => {
       { expiresIn: "12h" },
     );
 
-    const { password: adminPassword, ...otherDetails } = admin;
+    const {
+      password: adminPassword,
+      verification_token,
+      ...otherDetails
+    } = admin;
 
     res.status(200).json({
       message: "Admin login succesful!",
@@ -399,30 +399,48 @@ export const adminLogin = async (req, res) => {
 };
 
 export const adminRegister = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { email, password, name, surname, tel_no, birthdate } = req.body;
 
-  if (!username || !email || !password) {
-    return res.status(400).json({ error: "Please fill all fields!" });
+  const connection = await db.getConnection();
+
+  if (!email || !password || !name || !surname || !tel_no || !birthdate) {
+    return res.status(400).json({ error: "Please fill all required fields!" });
   }
 
   try {
-    const [existingAdmin] = await db.query(
-      "SELECT * FROM admins WHERE username = ? OR email = ?",
-      [username, email],
+    const [existingAdmin] = await connection.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email],
     );
 
     if (existingAdmin.length > 0) {
-      return res.status(400).json({ error: "This admin is already exists!" });
+      connection.release();
+      return res.status(400).json({ error: "This email is already exists!" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.query(
-      "INSERT INTO admins (username, email, password, role) VALUES (?, ?, ?, 'admin')",
-      [username, email, hashedPassword],
+
+    await connection.beginTransaction();
+
+    const [userResult] = await connection.query(
+      "INSERT INTO users (password, tel_no, email, birthdate, name, surname, is_verified, user_type) VALUES (?, ?, ?, ?, ?, ?, 1, 'admin')",
+      [hashedPassword, tel_no, email, birthdate, name, surname],
     );
+
+    const userId = userResult.insertId;
+
+    await connection.query(
+      "INSERT INTO admins (user_id, role ) VALUES (?, 'admin')",
+      [userId],
+    );
+    await connection.commit();
+
     res.status(201).json({ message: "Admin created successfully" });
   } catch (error) {
+    await connection.rollback();
     console.error(error);
     res.status(500).json({ error: "Backend error" });
+  } finally {
+    connection.release();
   }
 };

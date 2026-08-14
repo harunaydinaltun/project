@@ -1,5 +1,19 @@
-export const PasswordConditions = ({ conditions, errors, t }) => {
-  const showConditions = errors?.password?.length > 0;
+export const PasswordConditions = ({
+  conditions,
+  errors,
+  t,
+  errorKey = "password",
+}) => {
+  const showConditions = errors?.[errorKey]?.length > 0;
+
+  const condTexts = t?.passwordConditions || {
+    length: "En az 6 karakter",
+    lowerCase: "En az 1 küçük harf",
+    upperCase: "En az 1 büyük harf",
+    number: "En az 1 rakam",
+    special: "En az 1 özel karakter",
+    noSpaces: "Boşluk içermemeli",
+  };
 
   return (
     <div
@@ -10,30 +24,20 @@ export const PasswordConditions = ({ conditions, errors, t }) => {
       }`}
     >
       <div className="overflow-hidden flex flex-col gap-0.5">
-        <ConditionItem
-          isValid={conditions.length}
-          text={t.passwordConditions.length}
-        />
+        <ConditionItem isValid={conditions.length} text={condTexts.length} />
         <ConditionItem
           isValid={conditions.lowerCase}
-          text={t.passwordConditions.lowerCase}
+          text={condTexts.lowerCase}
         />
         <ConditionItem
           isValid={conditions.upperCase}
-          text={t.passwordConditions.upperCase}
+          text={condTexts.upperCase}
         />
-        <ConditionItem
-          isValid={conditions.number}
-          text={t.passwordConditions.number}
-        />
-        <ConditionItem
-          isValid={conditions.special}
-          text={t.passwordConditions.special}
-        />
-
+        <ConditionItem isValid={conditions.number} text={condTexts.number} />
+        <ConditionItem isValid={conditions.special} text={condTexts.special} />
         <ConditionItem
           isValid={conditions.noSpaces}
-          text={t.passwordConditions.noSpaces}
+          text={condTexts.noSpaces}
         />
       </div>
     </div>

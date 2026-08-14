@@ -57,14 +57,6 @@ export const RegisterPage = ({ t }) => {
         />
 
         <CustomInput
-          label={t.username}
-          name="username"
-          value={inputs.username}
-          onChange={handleChange}
-          error={errors.username}
-          maxLength={30}
-        />
-        <CustomInput
           label={t.email}
           type="email"
           name="email"

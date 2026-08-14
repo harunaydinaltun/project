@@ -7,7 +7,6 @@ export const useRegisterForm = (t) => {
   const today = new Date().toISOString().split("T")[0];
 
   const [inputs, setInputs] = useState({
-    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -20,7 +19,6 @@ export const useRegisterForm = (t) => {
   const [err, setErr] = useState(null);
 
   const [errors, setErrors] = useState({
-    username: "",
     birthdate: "",
     email: "",
     password: "",
@@ -117,17 +115,6 @@ export const useRegisterForm = (t) => {
       }
     }
 
-    if (name === "username") {
-      if (/[!-/]+/.test(value) || (value.length > 0 && /\s/.test(value))) {
-        setErrors((prev) => ({
-          ...prev,
-          username: t.usernameError,
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, username: "" }));
-      }
-    }
-
     if (name === "password") {
       setPasswordConditions({
         length: value.length >= 6,
@@ -191,7 +178,6 @@ export const useRegisterForm = (t) => {
       ...inputs,
       name: inputs.name.trim(),
       surname: inputs.surname.trim(),
-      username: inputs.username.trim(),
       email: inputs.email.trim(),
       tel_no: inputs.tel_no.replace(/\s+/g, ""),
     };

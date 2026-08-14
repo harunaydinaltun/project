@@ -1,11 +1,11 @@
 import { db } from "../connect.js";
 
 export const getAllModels = async (req, res) => {
-  let query = "SELECT * FROM models";
+  let query = "SELECT * FROM models ORDER BY brand";
 
   try {
     const [data] = await db.query(query);
-    return res.status(200).json({ data });
+    return res.status(200).json({ data: data });
   } catch (error) {
     console.error("Backend error: ", error.sqlMessage || error);
     return res.status(500).json({ message: "Backend error", error: error });

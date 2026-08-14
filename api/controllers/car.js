@@ -22,17 +22,16 @@ export const getAvailableCars = async (req, res) => {
   } = req.query;
 
   if (!startDate || !endDate || !pickupLocationId || !returnLocationId) {
-    return res
-      .status(400)
-      .json({
-        message:
-          "Başlangıç tarihi, bitiş tarihi, alış ve teslim noktaları zorunludur",
-      });
+    return res.status(400).json({
+      message:
+        "Başlangıç tarihi, bitiş tarihi, alış ve teslim noktaları zorunludur",
+    });
   }
 
   let baseQuery = `
       FROM cars
       INNER JOIN models ON cars.modelId = models.id
+      INNER JOIN locations ON cars.locationId = locations.id
       WHERE 
         NOT EXISTS (
             SELECT 1 
@@ -40,6 +39,7 @@ export const getAvailableCars = async (req, res) => {
             WHERE r.car_id = cars.id 
               AND r.start_date < ? 
               AND r.end_date > ?
+              AND r.status IN ('confirmed','active')
         )
         AND ? = COALESCE(
             (
@@ -47,6 +47,7 @@ export const getAvailableCars = async (req, res) => {
                 FROM rentals r 
                 WHERE r.car_id = cars.id 
                   AND r.end_date <= ?
+                  AND r.status IN ('confirmed','active','finished')
                 ORDER BY r.end_date DESC, r.id DESC 
                 LIMIT 1
             ), 
@@ -58,6 +59,7 @@ export const getAvailableCars = async (req, res) => {
                 FROM rentals r 
                 WHERE r.car_id = cars.id 
                   AND r.start_date >= ?
+                  AND r.status IN ('confirmed','active','finished')
                 ORDER BY r.start_date ASC, r.id ASC 
                 LIMIT 1
             ), 
@@ -131,7 +133,7 @@ export const getAvailableCars = async (req, res) => {
       SELECT 
         cars.id AS car_id, cars.licensePlate, cars.dailyPrice, cars.deposit, cars.locationId,
         cars.color, models.year, models.brand, models.modelName, models.bodyType,
-        models.doors, models.fuelType, models.gearType, models.trim, models.engineSize, models.minAge, models.img
+        models.doors, models.fuelType, models.gearType, models.trim, models.engineSize, models.minAge, models.img, locations.name AS locationName
   ` + baseQuery;
 
   const offset = (Number(page) - 1) * Number(limit);
@@ -233,5 +235,17 @@ export const addCar = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Server error", error: err.sqlMessage || err });
+  }
+};
+
+export const getCarCountByModelId = async (req, res) => {
+  const { id } = req.query;
+
+  try {
+    const query = "SELECT COUNT(id) as count FROM cars WHERE modelId = ?";
+    const [data] = await db.query(query, [id]);
+    return res.status(200).json({ data: data });
+  } catch (error) {
+    return res.status(500).json({ error: "Backend error" });
   }
 };

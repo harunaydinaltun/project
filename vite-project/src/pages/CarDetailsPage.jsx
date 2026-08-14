@@ -8,9 +8,11 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import api from "../utils/api";
+import { useLocations } from "../context/LocationContext";
 
 export const CarDetailsPage = () => {
   const { currentUser, logout } = useAuth();
+  const { getLocationName, getLocationAddress } = useLocations();
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -147,10 +149,16 @@ export const CarDetailsPage = () => {
                   <b>İade:</b> {endDate.replace("T", " ")}
                 </span>
                 <span>
-                  <b>Alış Şubesi:</b> {pickUpLocation}
+                  <b>Alış Şubesi:</b> {getLocationName(pickUpLocation)}
+                  <p className="text-sm">
+                    {getLocationAddress(pickUpLocation)}
+                  </p>
                 </span>
                 <span>
-                  <b>İade Şubesi:</b> {dropOffLocation}
+                  <b>İade Şubesi:</b> {getLocationName(dropOffLocation)}
+                  <p className="text-sm">
+                    {getLocationAddress(dropOffLocation)}
+                  </p>
                 </span>
                 <span>
                   <b>Toplam Süre:</b> {daysDiff} Gün

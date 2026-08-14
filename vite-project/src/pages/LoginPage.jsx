@@ -10,7 +10,7 @@ export const LoginPage = ({ t }) => {
   const { login } = useAuth();
 
   const [inputs, setInputs] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -67,13 +67,11 @@ export const LoginPage = ({ t }) => {
           src={logo}
           alt=""
         />
-        <span className=" text-xs text-slate-500 font-semibold">
-          {t.username}
-        </span>
+        <span className=" text-xs text-slate-500 font-semibold">{t.email}</span>
         <input
           className="border rounded-sm p-1 pl-2"
           type="text"
-          name="username"
+          name="email"
           onChange={handleChange}
         />
         <span className="text-xs text-slate-500 font-semibold">

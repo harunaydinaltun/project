@@ -84,7 +84,7 @@ export const Home = ({ t, setLang, lang }) => {
             {currentUser ? (
               <div className="flex flex-col items-start">
                 <span className="text-xs font-semibold text-green-600">
-                  {t.welcome}, {currentUser.username}
+                  {t.welcome}, {currentUser.name}
                 </span>
                 <button
                   className=" rounded-lg p-1 text-shadow-lg bg-slate-100 text-[13px] cursor-pointer hover:bg-slate-200 hover:scale-[0.99] transition-all duration-300"

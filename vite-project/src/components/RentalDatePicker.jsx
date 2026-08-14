@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import api from "../utils/api";
+import { useEffect } from "react";
+import { useLocations } from "../context/LocationContext";
 
 export const RentalDatePicker = ({
   pickUpLocation,
@@ -16,16 +16,7 @@ export const RentalDatePicker = ({
   setDropOffTime,
   t = {},
 }) => {
-  const [locations, setLocations] = useState([]);
-
-  useEffect(() => {
-    api
-      .get("/locations")
-      .then((res) => {
-        setLocations(res.data.data);
-      })
-      .catch((err) => console.error("Lokasyon verisi alınamadı:", err));
-  }, []);
+  const { locations } = useLocations();
 
   const now = new Date();
   const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -82,7 +73,7 @@ export const RentalDatePicker = ({
           </option>
           {locations.map((loc) => (
             <option key={loc.id} value={loc.id}>
-              {loc.id}
+              {loc.locationName}
             </option>
           ))}
         </select>
@@ -124,7 +115,7 @@ export const RentalDatePicker = ({
           </option>
           {locations.map((loc) => (
             <option key={loc.id} value={loc.id}>
-              {loc.id}
+              {loc.locationName}
             </option>
           ))}
         </select>
