@@ -19,7 +19,7 @@ export const Payment = ({
   rentalId,
 }) => {
   return (
-    <div>
+    <div className="flex items-center justify-center max-w-9/10">
       {step === "packet" && (
         <Packet
           daysDiff={daysDiff}

@@ -6,6 +6,8 @@ import {
 } from "../../constants/carConstants.js";
 import api from "../../utils/api.js";
 import { AiFillWarning } from "react-icons/ai";
+import { CustomInput } from "../CustomInput.jsx";
+import { addModelSchema } from "../../validations/ModelValidations.js";
 
 export const AdminAddModel = ({ setActiveTab }) => {
   const [inputs, setInputs] = useState({
@@ -32,6 +34,8 @@ export const AdminAddModel = ({ setActiveTab }) => {
     const finalValue =
       type === "number" ? (value === "" ? "" : Number(value)) : value;
     setInputs((prev) => ({ ...prev, [name]: finalValue }));
+
+    if (error) setError(null);
   };
 
   const handleInitialSubmit = (e) => {
@@ -43,28 +47,15 @@ export const AdminAddModel = ({ setActiveTab }) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (inputs.year < 1940) {
-      return setError(
-        "Lütfen model yılı için 1940'dan daha büyük bir değer giriniz.",
-      );
+    const validationResult = addModelSchema.safeParse(inputs);
+
+    if (!validationResult.success) {
+      setIsLoading(false);
+      setIsConfirming(false);
+      return setError(validationResult.error.issues[0].message);
     }
 
-    if (inputs.doors > 9 || inputs.doors < 1) {
-      return setError("Kapı sayısı 1-9 arası değerler olmalıdır");
-    }
-
-    const trimmedBrand = inputs.brand.trim();
-    const trimmedModelName = inputs.modelName.trim();
-    const trimmedTrim = inputs.trim.trim();
-    const trimmedEngineSize = inputs.engineSize.trim();
-
-    const formatedInputs = {
-      ...inputs,
-      brand: trimmedBrand,
-      modelName: trimmedModelName,
-      trim: trimmedTrim,
-      engineSize: trimmedEngineSize,
-    };
+    const formatedInputs = validationResult.data;
 
     try {
       const token = localStorage.getItem("token");
@@ -97,9 +88,12 @@ export const AdminAddModel = ({ setActiveTab }) => {
   };
 
   return (
-    <div className="flex flex-col min-w-2xs mt-5">
+    <div className="flex flex-col min-w-2xs mt-5 bg-slate-50 p-3 rounded-2xl shadow-xl">
+      <h1 className="flex self-center text-xl font-semibold text-slate-800">
+        Model Ekle
+      </h1>
       <form className="flex flex-col gap-0.5" onSubmit={handleInitialSubmit}>
-        <input
+        <CustomInput
           className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           placeholder="Marka"
           onChange={handleChange}
@@ -107,8 +101,8 @@ export const AdminAddModel = ({ setActiveTab }) => {
           disabled={isConfirming}
           required
           value={inputs.brand}
-        ></input>
-        <input
+        ></CustomInput>
+        <CustomInput
           className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           placeholder="Model"
           onChange={handleChange}
@@ -116,8 +110,8 @@ export const AdminAddModel = ({ setActiveTab }) => {
           disabled={isConfirming}
           required
           value={inputs.modelName}
-        ></input>
-        <input
+        ></CustomInput>
+        <CustomInput
           className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           placeholder="Trim"
           onChange={handleChange}
@@ -125,9 +119,9 @@ export const AdminAddModel = ({ setActiveTab }) => {
           disabled={isConfirming}
           required
           value={inputs.trim}
-        ></input>
+        ></CustomInput>
 
-        <input
+        <CustomInput
           className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           placeholder="Engine Size"
           onChange={handleChange}
@@ -135,8 +129,8 @@ export const AdminAddModel = ({ setActiveTab }) => {
           disabled={isConfirming}
           required
           value={inputs.engineSize}
-        ></input>
-        <input
+        ></CustomInput>
+        <CustomInput
           className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           type="number"
           placeholder="Year"
@@ -145,7 +139,7 @@ export const AdminAddModel = ({ setActiveTab }) => {
           disabled={isConfirming}
           required
           value={inputs.year}
-        ></input>
+        ></CustomInput>
         <select
           className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           onChange={handleChange}
@@ -185,7 +179,7 @@ export const AdminAddModel = ({ setActiveTab }) => {
             <option key={index}>{c}</option>
           ))}
         </select>
-        <input
+        <CustomInput
           className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           type="number"
           placeholder="Kapı Sayısı"
@@ -194,8 +188,8 @@ export const AdminAddModel = ({ setActiveTab }) => {
           disabled={isConfirming}
           required
           value={inputs.doors}
-        ></input>
-        <input
+        ></CustomInput>
+        <CustomInput
           className="bg-slate-200 rounded-sm p-1 pl-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           type="number"
           placeholder="Minumum Yaş Sınırı"
@@ -204,7 +198,7 @@ export const AdminAddModel = ({ setActiveTab }) => {
           disabled={isConfirming}
           required
           value={inputs.minAge}
-        ></input>
+        ></CustomInput>
         {!isConfirming ? (
           <button
             className="w-full bg-blue-600 hover:bg-blue-700 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base mt-2 hover:cursor-pointer hover:scale-[0.99]"
@@ -239,34 +233,34 @@ export const AdminAddModel = ({ setActiveTab }) => {
         )}
       </form>
       {error && (
-        <span className="text-red-600 text-[13px] flex justify-center">
+        <span className="text-red-600 text-[13px] flex justify-center mt-2 text-center">
           {error}
         </span>
       )}
       {message && (
-        <span className="text-green-600 text-[13px] flex justify-center">
+        <span className="text-green-600 text-[13px] flex justify-center mt-2 text-center">
           {message}
         </span>
       )}
       {showModelsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md">
-          <div className="flex flex-col bg-slate-50 w-fit h-fit rounded-2xl p-15 justify-center items-center">
+          <div className="flex flex-col bg-slate-50 w-fit h-fit rounded-2xl p-15 justify-center items-center shadow-2xl ring-1 ring-slate-200">
             <div className="text-red-600">
               <AiFillWarning size={40} />
             </div>
-            <span className="text-xl text-slate-800 font-semibold">
+            <span className="text-xl text-slate-800 font-semibold text-center mt-2">
               Yeni bir model eklemeden önce mevcut modelleri görüntülemeniz
               tavsiye edilir
             </span>
-            <div className="flex gap-x-3 w-3/4 justify-evenly mt-3">
+            <div className="flex gap-x-3 w-3/4 justify-evenly mt-6">
               <button
-                className="flex-1 text-lg bg-blue-600 text-slate-100 p-2 rounded-xl font-semibold ring ring-blue-500 hover:bg-blue-700 active:scale-[0.99] duration-200 cursor-pointer"
+                className="flex-1 text-base bg-blue-600 text-slate-100 p-2 rounded-xl font-semibold hover:bg-blue-700 active:scale-[0.99] duration-200 cursor-pointer"
                 onClick={() => setActiveTab("showmodels")}
               >
                 Modelleri Görüntüle
               </button>
               <button
-                className="flex-1 text-lg bg-slate-400 text-slate-50 p-2 rounded-xl font-semibold ring ring-slate-300 hover:bg-slate-500 active:scale-[0.99] duration-200 cursor-pointer"
+                className="flex-1 text-base bg-slate-400 text-slate-50 p-2 rounded-xl font-semibold hover:bg-slate-500 active:scale-[0.99] duration-200 cursor-pointer"
                 onClick={() => {
                   setShowModelModal(false);
                 }}

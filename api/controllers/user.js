@@ -1,5 +1,7 @@
 import { db } from "../connect.js";
 import bcrypt from "bcryptjs";
+import { registerSchema } from "../validations/AuthValidations.js";
+import { changePasswordSchema } from "../validations/UserValidations.js";
 
 export const updateProfile = async (req, res) => {
   const userId = req.user.id;
@@ -24,10 +26,21 @@ export const updateProfile = async (req, res) => {
       .json({ error: "Bu alanı güncelleme yetkiniz bulunmamaktadır." });
   }
 
+  const fieldSchema = registerSchema.shape[fieldToUpdate];
+  const validationResult = fieldSchema.safeParse(newValue);
+
+  if (!validationResult.success) {
+    return res.status(400).json({
+      error: validationResult.error.issues[0].message,
+    });
+  }
+
+  const validValue = validationResult.data;
+
   try {
     const query = `UPDATE users SET ${fieldToUpdate} = ? WHERE id = ?`;
 
-    await db.query(query, [newValue, userId]);
+    await db.query(query, [validValue, userId]);
 
     res.status(200).json({ message: "Profil bilgisi başarıyla güncellendi." });
   } catch (error) {
@@ -38,27 +51,16 @@ export const updateProfile = async (req, res) => {
 
 export const changePassword = async (req, res) => {
   const userId = req.user.id;
-  const { currentPassword, newPassword } = req.body;
+  const validationResult = changePasswordSchema.safeParse(req.body);
 
-  if (!currentPassword || !newPassword) {
+  if (!validationResult.success) {
     return res
       .status(400)
-      .json({ error: "Lütfen mevcut ve yeni şifrelerinizi girin" });
+      .json({ error: validationResult.error.issues[0].message });
   }
 
-  if (
-    newPassword.length < 6 ||
-    !/[a-zçğıöşü]+/.test(newPassword) ||
-    !/[A-ZÇĞİÖŞÜ]+/.test(newPassword) ||
-    !/[0-9]+/.test(newPassword) ||
-    !/[!-/]+/.test(newPassword) ||
-    /\s/.test(newPassword) ||
-    newPassword.length > 64
-  ) {
-    return res.status(400).json({
-      error: "Your password don't match requirements",
-    });
-  }
+  const { currentPassword, newPassword } = validationResult.data;
+
   try {
     const [users] = await db.query(
       "SELECT id, password FROM users WHERE id = ?",

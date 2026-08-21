@@ -1,7 +1,21 @@
 import { db } from "../connect.js";
-import cardValidator from "card-validator";
+import { checkoutSchema } from "../validations/PaymentValidations.js";
 
 export const processCheckout = async (req, res) => {
+  const user_id = req.user?.id;
+
+  if (!user_id) {
+    return res
+      .status(401)
+      .json({ message: "Bu işlem için giriş yapmalısınız." });
+  }
+  const validationResult = checkoutSchema.safeParse(req.body);
+
+  if (!validationResult.success) {
+    return res.status(400).json({
+      message: validationResult.error.issues[0].message,
+    });
+  }
   const {
     car_id,
     start_date,
@@ -12,47 +26,7 @@ export const processCheckout = async (req, res) => {
     extras,
     totalPrice,
     cardDetails,
-  } = req.body;
-
-  const user_id = req.user?.id;
-
-  if (
-    !car_id ||
-    !start_date ||
-    !end_date ||
-    !user_id ||
-    !cardDetails.cardNumber
-  ) {
-    return res.status(400).json({ message: "Eksik veya geçersiz bilgi" });
-  }
-
-  const startDateObj = new Date(start_date);
-  const endDateObj = new Date(end_date);
-
-  if (startDateObj >= endDateObj) {
-    return res
-      .status(400)
-      .json({ message: "Bitiş tarihi, başlangıç tarihinden önce olamaz" });
-  }
-
-  if (extras && !Array.isArray(extras)) {
-    return res
-      .status(400)
-      .json({ message: "Ekstralar geçersiz bir formatta gönderildi." });
-  }
-
-  const numberValidation = cardValidator.number(cardDetails.cardNumber);
-  const cvvValidation = cardValidator.cvv(cardDetails.cvv);
-  const expirationValidation = cardValidator.expirationDate(
-    cardDetails.expireDate,
-  );
-
-  if (!numberValidation.isValid)
-    return res.status(400).json({ message: "Geçersiz kart numarası" });
-  if (!expirationValidation.isValid)
-    return res.status(400).json({ message: "Geçersiz son kullanma tarihi" });
-  if (!cvvValidation.isValid)
-    return res.status(400).json({ message: "Geçersiz cvv" });
+  } = validationResult.data;
 
   const connection = await db.getConnection();
 

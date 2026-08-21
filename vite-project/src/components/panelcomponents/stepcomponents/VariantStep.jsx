@@ -7,8 +7,8 @@ export const VariantStep = ({
   onBack,
 }) => {
   return (
-    <div className="flex flex-col gap-3 p-4 border rounded-lg bg-white shadow-sm">
-      <h3 className="text-lg font-semibold">
+    <div className="flex flex-col gap-3 p-4 ring ring-slate-100 rounded-lg bg-white shadow-xl">
+      <h3 className="text-lg font-semibold text-slate-800">
         Adım 4: Donanım Paketini Seçiniz
       </h3>
       <span className="text-sm bg-blue-100 text-blue-800 p-1 rounded w-max">
@@ -33,7 +33,7 @@ export const VariantStep = ({
                 <td className="p-2 border-b">
                   <button
                     onClick={() => onSelectVariant(v.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors cursor-pointer"
                   >
                     Seç
                   </button>
@@ -45,7 +45,7 @@ export const VariantStep = ({
       </div>
       <button
         onClick={onBack}
-        className="w-full bg-gray-500 text-white p-2 rounded mt-2"
+        className="w-full bg-gray-500 text-white p-2 rounded mt-2 cursor-pointer"
       >
         Geri Dön
       </button>

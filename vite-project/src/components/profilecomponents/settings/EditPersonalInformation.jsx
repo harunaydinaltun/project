@@ -9,6 +9,7 @@ import {
 import { FaUserEdit } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { CustomInput } from "../../CustomInput";
+import { registerSchema } from "../../../validations/AuthValidations";
 
 export const EditPersonalInformation = ({
   setStep,
@@ -21,6 +22,7 @@ export const EditPersonalInformation = ({
     surname: currentUser?.surname || "",
     tel_no: currentUser?.tel_no || "",
   });
+
   const [editing, setEditing] = useState({
     name: false,
     surname: false,
@@ -36,36 +38,17 @@ export const EditPersonalInformation = ({
   const [globalErr, setGlobalErr] = useState(null);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+
+    if (name === "tel_no") {
+      value = value.replace(/\s+/g, "");
+    }
+
     setInputs((prev) => ({ ...prev, [name]: value }));
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-  };
-
-  const validateField = (name, value) => {
-    if (!value || value.trim() === "") {
-      return t.emptyFieldError || "Bu alan boş bırakılamaz.";
-    }
-
-    if (name === "tel_no") {
-      const cleanTelNo = value.replace(/\s+/g, "");
-      if (cleanTelNo.length >= 2 && !cleanTelNo.startsWith("05")) {
-        return t.telnoError || "Telefon numarası 05 ile başlamalıdır.";
-      }
-      if (cleanTelNo.length !== 11) {
-        return "Telefon numarası 11 haneli olmalıdır.";
-      }
-    }
-
-    if (name === "name" || name === "surname") {
-      if (/[!-/]+/.test(value)) {
-        return t[`${name}Error`] || "Özel karakter içeremez.";
-      }
-    }
-
-    return "";
   };
 
   const handleCancel = (name) => {
@@ -75,26 +58,31 @@ export const EditPersonalInformation = ({
   };
 
   const handleConfirm = async (name) => {
-    const value = inputs[name];
-    const error = validateField(name, value);
+    const valueToValidate = inputs[name];
+    const fieldSchema = registerSchema.shape[name];
+    const validationResult = fieldSchema.safeParse(valueToValidate);
 
-    if (error) {
-      setErrors((prev) => ({ ...prev, [name]: error }));
+    if (!validationResult.success) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: validationResult.error.issues[0].message,
+      }));
       return;
     }
 
-    const formattedValue =
-      name === "tel_no" ? value.replace(/\s+/g, "") : value.trim();
+    const validValue = validationResult.data;
 
     try {
-      await api.patch("/users/profile", { [name]: formattedValue });
+      await api.patch("/users/profile", { [name]: validValue });
+
       if (setCurrentUser) {
         setCurrentUser((prevUser) => ({
           ...prevUser,
-          [name]: formattedValue,
+          [name]: validValue,
         }));
       }
 
+      setInputs((prev) => ({ ...prev, [name]: validValue }));
       setEditing((prev) => ({ ...prev, [name]: false }));
       setGlobalErr(null);
     } catch (error) {
@@ -135,13 +123,13 @@ export const EditPersonalInformation = ({
             <>
               <button
                 onClick={() => handleConfirm(name)}
-                className="flex items-center gap-1 bg-green-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition-all active:scale-95"
+                className="flex items-center gap-1 bg-green-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition-all active:scale-95 cursor-pointer"
               >
                 <IoCheckmarkOutline size={16} /> Onayla
               </button>
               <button
                 onClick={() => handleCancel(name)}
-                className="flex items-center gap-1 bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-slate-300 transition-all active:scale-95"
+                className="flex items-center gap-1 bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-slate-300 transition-all active:scale-95 cursor-pointer"
               >
                 <IoCloseOutline size={16} /> İptal
               </button>
@@ -149,7 +137,7 @@ export const EditPersonalInformation = ({
           ) : (
             <button
               onClick={() => setEditing((prev) => ({ ...prev, [name]: true }))}
-              className="flex items-center gap-1 bg-blue-50 text-blue-600 px-4 py-1.5 rounded-lg text-sm font-medium border border-blue-200 hover:bg-blue-100 transition-all active:scale-95"
+              className="flex items-center gap-1 bg-blue-50 text-blue-600 px-4 py-1.5 rounded-lg text-sm font-medium border border-blue-200 hover:bg-blue-100 transition-all active:scale-95 cursor-pointer"
             >
               <MdEdit size={16} /> Değiştir
             </button>

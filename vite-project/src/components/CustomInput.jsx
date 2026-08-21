@@ -9,6 +9,7 @@ export const CustomInput = ({
   placeholder,
   max,
   maxLength,
+  ...props
 }) => {
   return (
     <div className="flex flex-col max-w-full min-w-1/2">
@@ -23,6 +24,7 @@ export const CustomInput = ({
         placeholder={placeholder}
         max={max}
         maxLength={maxLength}
+        {...props}
       />
       <div
         className={`grid transition-all duration-500 ease-in-out ${

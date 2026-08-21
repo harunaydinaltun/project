@@ -13,7 +13,7 @@ export const FinishedRentals = ({ finishedRentals, setPage }) => {
             <span>Geri</span>
           </button>
           <h2 className="text-xl md:text-2xl font-bold text-slate-800">
-            Geçmiş Kiralamalarım
+            Geçmiş Rezervasyonlarım
           </h2>
           <div className="w-22 hidden md:block"></div>
         </div>

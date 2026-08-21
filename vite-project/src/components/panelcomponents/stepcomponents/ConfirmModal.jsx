@@ -38,13 +38,13 @@ export const ConfirmModal = ({
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 bg-red-500 text-white p-2 rounded"
+            className="flex-1 bg-red-500 text-white p-2 rounded cursor-pointer"
           >
             Değiştir
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 bg-green-600 text-white p-2 rounded"
+            className="flex-1 bg-green-600 text-white p-2 rounded cursor-pointer"
           >
             Onayla ve Devam Et
           </button>

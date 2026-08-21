@@ -20,7 +20,7 @@ export const ConfirmedRentals = ({ confirmedRentals, setPage }) => {
     try {
       setIsCanceling(true);
 
-      await api.put("/rentals/cancelById", { rentalId: selectedRentalId });
+      await api.patch("/rentals/cancelById", { rentalId: selectedRentalId });
 
       setIsModalOpen(false);
       navigate("/profile");

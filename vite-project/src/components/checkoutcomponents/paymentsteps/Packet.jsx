@@ -7,7 +7,7 @@ export const Packet = ({
   selectedPacket,
 }) => {
   return (
-    <div className="flex flex-col xl:flex-row gap-4 ">
+    <div className="flex flex-col xl:flex-row gap-4">
       {packets.map((packet) => (
         <PacketDetails
           key={packet.id}

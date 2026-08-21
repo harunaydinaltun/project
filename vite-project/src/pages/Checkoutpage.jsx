@@ -5,15 +5,8 @@ import ProgressBar from "../components/checkoutcomponents/ProgressBar";
 import { useState, useEffect } from "react";
 import PaymentSummary from "../components/checkoutcomponents/PaymentSummary";
 import api from "../utils/api";
-import {
-  validateTCNO,
-  validateName,
-  validatePhone,
-  validateCardNumber,
-  validateCardDate,
-  validateCardCvv,
-} from "../utils/checkoutvalidations";
 import CheckOutErrorModal from "../components/checkoutcomponents/CheckOutErrorModal";
+import { creditCardSchema } from "../validations/PaymentValidations";
 
 export const CheckoutPage = () => {
   const location = useLocation();
@@ -71,30 +64,16 @@ export const CheckoutPage = () => {
     if (step === "packet") return setStep("extra");
     if (step === "extra") return setStep("credit");
     if (step === "credit") {
-      const idError = validateTCNO(customerInfo.tcno);
-      const nameError = validateName(customerInfo.name);
-      const surnameError = validateName(customerInfo.surname);
-      const phoneError = validatePhone(customerInfo.phone);
+      const validationResult = creditCardSchema.safeParse({
+        ...customerInfo,
+        ...cardInfo,
+      });
 
-      const cardValidation = validateCardNumber(cardInfo.cardNumber);
-      const dateError = validateCardDate(cardInfo.expireDate);
-      const cvvError = validateCardCvv(cardInfo.cvv);
-      const ownerError = cardInfo.cardOwner.length < 3 ? "İsim çok kısa" : "";
-
-      if (
-        idError ||
-        nameError ||
-        surnameError ||
-        phoneError ||
-        cardValidation.error ||
-        dateError ||
-        cvvError ||
-        ownerError
-      ) {
+      if (!validationResult.success) {
         alert("Lütfen ilk önce hatalı ve eksik alanları düzeltin");
         return;
       }
-
+      const validData = validationResult.data;
       const payload = {
         car_id: car.car_id,
         start_date: startDate,
@@ -104,7 +83,12 @@ export const CheckoutPage = () => {
         packet_id: selectedPacket.id,
         extras: selectedExtras.map((ex) => ({ id: ex.id, price: ex.price })),
         totalPrice: grandTotal,
-        cardDetails: cardInfo,
+        cardDetails: {
+          cardNumber: validData.cardNumber,
+          expireDate: validData.expireDate,
+          cvv: cardInfo.cvv,
+          cardOwner: validData.cardOwner,
+        },
       };
 
       try {
@@ -142,7 +126,7 @@ export const CheckoutPage = () => {
     extrasTotalPrice;
 
   return (
-    <div className="flex flex-col md:flex-row mt-5 p-4 w-screen mx-auto">
+    <div className="flex flex-col md:flex-row mt-5 p-4 w-full mx-auto">
       <div className="w-full md:w-1/4 lg:w-1/4 shrink-0 p-3">
         <CarSummary car={car} />
         <PaymentSummary
@@ -158,39 +142,43 @@ export const CheckoutPage = () => {
           grandTotal={grandTotal}
         />
       </div>
-
-      <div className="w-full md:w-1/2 lg:w-1/2 flex flex-col mx-auto md:mt-0 p-3">
+      <div className="w-full md:w-3/4 flex flex-col items-center md:mt-0 p-3">
         <ProgressBar step={step} />
-        <Payment
-          step={step}
-          daysDiff={daysDiff}
-          packets={packets}
-          extras={extras}
-          setSelectedPacket={setSelectedPacket}
-          selectedPacket={selectedPacket}
-          setSelectedExtras={setSelectedExtras}
-          selectedExtras={selectedExtras}
-          customerInfo={customerInfo}
-          setCustomerInfo={setCustomerInfo}
-          cardInfo={cardInfo}
-          setCardInfo={setCardInfo}
-          rentalId={rentalId}
-        />
+        <div className="w-full min-h-112.5 flex justify-center ">
+          <Payment
+            step={step}
+            daysDiff={daysDiff}
+            packets={packets}
+            extras={extras}
+            setSelectedPacket={setSelectedPacket}
+            selectedPacket={selectedPacket}
+            setSelectedExtras={setSelectedExtras}
+            selectedExtras={selectedExtras}
+            customerInfo={customerInfo}
+            setCustomerInfo={setCustomerInfo}
+            cardInfo={cardInfo}
+            setCardInfo={setCardInfo}
+            rentalId={rentalId}
+          />
+        </div>
 
         {step === "confirm" ? (
           ""
         ) : (
-          <div className="flex gap-x-3">
-            {" "}
+          <div className="flex gap-x-3 w-full md:w-1/2 mt-8">
             <button
-              className={`bg-slate-500 min-w-1/2 mt-5 h-10 rounded-lg text-white duration-300 active:scale-[0.99] ${step === "packet" ? "opacity-25 disabled" : "hover:bg-slate-600 cursor-pointer"}`}
+              className={`flex-1 bg-slate-500 h-11 rounded-lg text-white font-medium duration-300 active:scale-[0.99] ${
+                step === "packet"
+                  ? "opacity-25 cursor-not-allowed"
+                  : "hover:bg-slate-600 cursor-pointer"
+              }`}
               onClick={handleBack}
-              disabled={loading}
+              disabled={loading || step === "packet"}
             >
               Geri
             </button>
             <button
-              className="bg-green-600 min-w-1/2 mt-5 h-10 rounded-lg text-white cursor-pointer hover:bg-green-700 duration-300 active:scale-[0.99]"
+              className="flex-1 bg-green-600 h-11 rounded-lg text-white font-medium cursor-pointer hover:bg-green-700 duration-300 active:scale-[0.99]"
               onClick={handleContinue}
               disabled={loading}
             >
@@ -198,13 +186,8 @@ export const CheckoutPage = () => {
             </button>
           </div>
         )}
-        {checkOutError ? (
-          <CheckOutErrorModal checkOutError={checkOutError} />
-        ) : (
-          ""
-        )}
+        {checkOutError && <CheckOutErrorModal checkOutError={checkOutError} />}
       </div>
-      <div className="hidden md:block md:w-1/4 lg:w-1/4 pointer-events-none"></div>
     </div>
   );
 };

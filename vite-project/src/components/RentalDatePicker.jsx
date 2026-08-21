@@ -19,16 +19,19 @@ export const RentalDatePicker = ({
   const { locations } = useLocations();
 
   const now = new Date();
+
+  const currentHourRounded =
+    now.getMinutes() > 0 ? now.getHours() + 1 : now.getHours();
+
   const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
     .toISOString()
     .split("T")[0];
-  const currentHour = now.getHours();
 
   const getAvailableTimes = (selectedDate, isDropOff = false) => {
     let startHour = 0;
 
     if (selectedDate === today) {
-      startHour = currentHour;
+      startHour = currentHourRounded;
     }
 
     if (isDropOff && selectedDate === pickUpDate && pickUpTime) {
@@ -38,7 +41,7 @@ export const RentalDatePicker = ({
       }
     }
 
-    return Array.from({ length: 24 - startHour }, (_, i) => {
+    return Array.from({ length: Math.max(0, 24 - startHour) }, (_, i) => {
       const hour = (i + startHour).toString().padStart(2, "0");
       return `${hour}:00`;
     });
@@ -50,11 +53,11 @@ export const RentalDatePicker = ({
   useEffect(() => {
     if (pickUpDate === today && pickUpTime) {
       const selectedHour = parseInt(pickUpTime.split(":")[0]);
-      if (selectedHour < currentHour) {
-        setPickUpTime(`${currentHour.toString().padStart(2, "0")}:00`);
+      if (selectedHour < currentHourRounded && currentHourRounded < 24) {
+        setPickUpTime(`${currentHourRounded.toString().padStart(2, "0")}:00`);
       }
     }
-  }, [pickUpDate, pickUpTime, today, currentHour, setPickUpTime]);
+  }, [pickUpDate, pickUpTime, today, currentHourRounded, setPickUpTime]);
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -81,13 +84,13 @@ export const RentalDatePicker = ({
         <div className="flex gap-2">
           <input
             type="date"
-            value={pickUpDate}
+            value={pickUpDate || ""}
             min={today}
             onChange={(e) => setPickUpDate(e.target.value)}
             className="flex-1 p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
           />
           <select
-            value={pickUpTime}
+            value={pickUpTime || ""}
             onChange={(e) => setPickUpTime(e.target.value)}
             className="w-24 p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
           >
@@ -123,13 +126,13 @@ export const RentalDatePicker = ({
         <div className="flex gap-2">
           <input
             type="date"
-            value={dropOffDate}
+            value={dropOffDate || ""}
             min={pickUpDate || today}
             onChange={(e) => setDropOffDate(e.target.value)}
             className="flex-1 p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
           />
           <select
-            value={dropOffTime}
+            value={dropOffTime || ""}
             onChange={(e) => setDropOffTime(e.target.value)}
             className="w-24 p-2.5 border border-slate-300 rounded-lg text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15"
           >

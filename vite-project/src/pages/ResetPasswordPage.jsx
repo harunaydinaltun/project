@@ -62,7 +62,7 @@ export const ResetPasswordPage = ({ t }) => {
     if (password !== confirmPassword) return setError("Şifreler eşleşmiyor.");
 
     try {
-      const res = await api.post("/auth/reset_password", {
+      const res = await api.post("/auth/reset-password", {
         token,
         newPassword: password,
       });

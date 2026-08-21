@@ -332,8 +332,30 @@ const ResultsPage = ({ t }) => {
         setIsPoppedUp={handleOpenPopUp}
       />
 
-      <div className="flex-1 flex flex-col justify-between ">
+      <div className="flex-1 flex flex-col justify-between max-w-8/10 mx-auto ">
         <div>
+          <div className="flex items-center justify-center gap-12">
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                Alış Tarihi
+              </span>
+              <span className="text-base font-semibold text-slate-700">
+                {activeStartDate}
+              </span>
+            </div>
+
+            <div className="h-8 w-px bg-slate-200 rounded-full"></div>
+
+            <div className="flex flex-col items-center gap-0.5">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                İade Tarihi
+              </span>
+              <span className="text-base font-semibold text-slate-700">
+                {activeEndDate}
+              </span>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {cars.map((car) => (
               <CarCard

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { registerSchema } from "../validations/AuthValidations";
 
 export const useRegisterForm = (t) => {
   const navigate = useNavigate();
@@ -17,15 +18,7 @@ export const useRegisterForm = (t) => {
   });
 
   const [err, setErr] = useState(null);
-
-  const [errors, setErrors] = useState({
-    birthdate: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    tel_no: "",
-  });
-
+  const [errors, setErrors] = useState({});
   const [passwordConditions, setPasswordConditions] = useState({
     lowerCase: false,
     upperCase: false,
@@ -36,84 +29,14 @@ export const useRegisterForm = (t) => {
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setInputs((prev) => ({ ...prev, [name]: value }));
+    let { name, value } = e.target;
 
     if (name === "tel_no") {
-      const cleanTelNo = value.replace(/\s+/g, "");
-
-      if (!value) {
-        setErrors((prev) => ({ ...prev, tel_no: "" }));
-      } else if (cleanTelNo.length >= 2 && !cleanTelNo.startsWith("05")) {
-        setErrors((prev) => ({
-          ...prev,
-          tel_no: t.telnoError,
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, tel_no: "" }));
-      }
+      value = value.replace(/\s+/g, "");
     }
 
-    if (name === "name") {
-      if (/[!-/]+/.test(value)) {
-        setErrors((prev) => ({
-          ...prev,
-          name: t.nameError,
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, name: "" }));
-      }
-    }
-
-    if (name === "surname") {
-      if (/[!-/]+/.test(value)) {
-        setErrors((prev) => ({
-          ...prev,
-          surname: t.surnameError,
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, surname: "" }));
-      }
-    }
-
-    if (name === "birthdate") {
-      const birthDate = new Date(value);
-      const todayDate = new Date();
-
-      let age = todayDate.getFullYear() - birthDate.getFullYear();
-      const monthDiff = todayDate.getMonth() - birthDate.getMonth();
-
-      if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && todayDate.getDate() < birthDate.getDate())
-      ) {
-        age--;
-      }
-
-      if (age < 18) {
-        setErrors((prev) => ({
-          ...prev,
-          birthdate: t.ageError,
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, birthdate: "" }));
-      }
-    }
-
-    if (name === "email") {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!value) {
-        setErrors((prev) => ({ ...prev, email: "" }));
-      } else if (!emailRegex.test(value)) {
-        setErrors((prev) => ({
-          ...prev,
-          email: t.emailError,
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, email: "" }));
-      }
-    }
+    const newInputs = { ...inputs, [name]: value };
+    setInputs(newInputs);
 
     if (name === "password") {
       setPasswordConditions({
@@ -124,37 +47,22 @@ export const useRegisterForm = (t) => {
         special: /[!-/]+/.test(value),
         noSpaces: value.length > 0 && !/\s/.test(value),
       });
-
-      if (
-        value.length < 6 ||
-        !/[a-zçğıöşü]+/.test(value) ||
-        !/[A-ZÇĞİÖŞÜ]+/.test(value) ||
-        !/[0-9]+/.test(value) ||
-        !/[!-/]+/.test(value) ||
-        /\s/.test(value)
-      ) {
-        setErrors((prev) => ({
-          ...prev,
-          password: t.passwordConditionsError,
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, password: "" }));
-      }
     }
 
-    if (name === "password" || name === "confirmPassword") {
-      const passwordToCompare = name === "password" ? value : inputs.password;
-      const confirmToCompare =
-        name === "confirmPassword" ? value : inputs.confirmPassword;
+    const result = registerSchema.safeParse(newInputs);
 
-      if (confirmToCompare && confirmToCompare !== passwordToCompare) {
-        setErrors((prev) => ({
-          ...prev,
-          confirmPassword: t.passwordsDontMatch,
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, confirmPassword: "" }));
-      }
+    if (!result.success) {
+      const formattedErrors = result.error.format();
+
+      setErrors((prev) => ({
+        ...prev,
+        [name]: formattedErrors[name]?._errors[0] || "",
+        ...(name === "password" && {
+          confirmPassword: formattedErrors.confirmPassword?._errors[0] || "",
+        }),
+      }));
+    } else {
+      setErrors({});
     }
   };
 
@@ -162,25 +70,28 @@ export const useRegisterForm = (t) => {
     e.preventDefault();
     setErr(null);
 
-    const hasValidationErrors = Object.values(errors).some(
-      (error) => error !== "",
-    );
-    if (hasValidationErrors) {
+    const result = registerSchema.safeParse(inputs);
+
+    if (!result.success) {
+      const formattedErrorsData = result.error.format();
+      const formattedErrors = {};
+
+      Object.keys(inputs).forEach((key) => {
+        if (formattedErrorsData[key]?._errors?.[0]) {
+          formattedErrors[key] = formattedErrorsData[key]._errors[0];
+        }
+      });
+      if (formattedErrorsData._errors?.[0]) {
+        formattedErrors.confirmPassword = formattedErrorsData._errors[0];
+      }
+
+      setErrors(formattedErrors);
       return setErr(t.fieldError);
     }
 
-    const hasEmptyFields = Object.values(inputs).some((value) => value === "");
-    if (hasEmptyFields) {
-      return setErr(t.emptyFieldError);
-    }
+    const formattedInputs = result.data;
 
-    const formattedInputs = {
-      ...inputs,
-      name: inputs.name.trim(),
-      surname: inputs.surname.trim(),
-      email: inputs.email.trim(),
-      tel_no: inputs.tel_no.replace(/\s+/g, ""),
-    };
+    delete formattedInputs.confirmPassword;
 
     try {
       await api.post("/auth/register", formattedInputs);

@@ -9,11 +9,32 @@ export const Home = ({ t, setLang, lang }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
-  const [pickUpDate, setPickUpDate] = useState("");
-  const [pickUpTime, setPickUpTime] = useState("10:00");
+  const now = new Date();
 
-  const [dropOffDate, setDropOffDate] = useState("");
-  const [dropOffTime, setDropOffTime] = useState("10:00");
+  let roundedHour = now.getMinutes() > 0 ? now.getHours() + 1 : now.getHours();
+
+  if (roundedHour >= 24) roundedHour = 23;
+
+  const defaultHourStr = `${roundedHour.toString().padStart(2, "0")}:00`;
+
+  const defaultPickUpDate = new Date(
+    now.getTime() - now.getTimezoneOffset() * 60000,
+  )
+    .toISOString()
+    .split("T")[0];
+
+  const futureDate = new Date(now);
+  futureDate.setDate(futureDate.getDate() + 2);
+  const defaultDropOffDate = new Date(
+    futureDate.getTime() - futureDate.getTimezoneOffset() * 60000,
+  )
+    .toISOString()
+    .split("T")[0];
+  const [pickUpDate, setPickUpDate] = useState(defaultPickUpDate);
+  const [pickUpTime, setPickUpTime] = useState(defaultHourStr);
+
+  const [dropOffDate, setDropOffDate] = useState(defaultDropOffDate);
+  const [dropOffTime, setDropOffTime] = useState(defaultHourStr);
 
   const [pickUpLocation, setPickUpLocation] = useState("");
   const [dropOffLocation, setDropOffLocation] = useState("");
@@ -22,7 +43,12 @@ export const Home = ({ t, setLang, lang }) => {
     e.preventDefault();
 
     if (!pickUpDate || !dropOffDate) {
-      alert("tarihleri seçin");
+      alert("Lütfen tarihleri seçin");
+      return;
+    }
+
+    if (!pickUpLocation || !dropOffLocation) {
+      alert("Lütfen alış ve teslim şubelerini seçin.");
       return;
     }
 

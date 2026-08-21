@@ -6,11 +6,23 @@ import AdminAddCar from "../components/panelcomponents/AdminAddCar";
 import AdminShowModels from "../components/panelcomponents/AdminShowModels";
 import { CgProfile } from "react-icons/cg";
 import { useNavigate } from "react-router-dom";
+import AdminEditModel from "../components/panelcomponents/AdminEditModel";
+import AdminAddManager from "../components/panelcomponents/AdminAddManager";
+import AdminShowBranches from "../components/panelcomponents/AdminShowBranches";
+import AdminShowBranchDetails from "../components/panelcomponents/AdminShowBranchDetails";
+import AdminEditLocInfo from "../components/panelcomponents/AdminEditLocInfo";
 
 export const AdminPanelPage = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("welcome");
+  const [editModelData, setEditModelData] = useState(null);
+  const [selectedBranchId, setSelectedBranchId] = useState("");
+
+  const handleOpenEditModel = (modelData) => {
+    setEditModelData(modelData);
+    setActiveTab("editmodel");
+  };
 
   return (
     <div className="flex min-w-full min-h-screen">
@@ -47,12 +59,39 @@ export const AdminPanelPage = () => {
             </div>
           </div>
         )}
-        {activeTab === "branches" && <span>Şubeler</span>}
+        {activeTab === "addmanager" && <AdminAddManager />}
+        {activeTab === "branches" && (
+          <AdminShowBranches
+            setActiveTab={setActiveTab}
+            setSelectedBranchId={setSelectedBranchId}
+          />
+        )}
         {activeTab === "addcars" && <AdminAddCar />}
         {activeTab === "addmodels" && (
           <AdminAddModel setActiveTab={setActiveTab} />
         )}
-        {activeTab === "showmodels" && <AdminShowModels />}
+        {activeTab === "showmodels" && (
+          <AdminShowModels onEdit={handleOpenEditModel} />
+        )}
+        {activeTab === "editmodel" && (
+          <AdminEditModel
+            model={editModelData.model}
+            count={editModelData.count}
+            onBack={() => setActiveTab("showmodels")}
+          />
+        )}
+        {activeTab === "showbranchdetails" && (
+          <AdminShowBranchDetails
+            selectedBranchId={selectedBranchId}
+            setActiveTab={setActiveTab}
+          />
+        )}
+        {activeTab === "editlocinfo" && (
+          <AdminEditLocInfo
+            selectedBranchId={selectedBranchId}
+            setActiveTab={setActiveTab}
+          />
+        )}
       </div>
     </div>
   );

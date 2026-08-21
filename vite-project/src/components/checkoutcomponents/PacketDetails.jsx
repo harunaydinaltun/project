@@ -2,7 +2,7 @@ import { RiStarSFill } from "react-icons/ri";
 export const PacketDetails = ({ packet, selected, onSelect }) => {
   return (
     <div
-      className={`flex flex-col bg-slate-50 p-3 rounded-xl shadow-lg border-2 cursor-pointer xl:max-w-1/3 hover:shadow-xl duration-300 ${selected.id === packet.id ? `border-blue-500 scale-[1.02]` : `border-slate-300`} `}
+      className={`flex flex-col bg-slate-50 p-3 rounded-xl shadow-lg border-2 cursor-pointer xl:w-1/3 hover:shadow-xl duration-300 ${selected.id === packet.id ? `border-blue-500 scale-[1.02]` : `border-slate-300`} `}
       onClick={onSelect}
     >
       {" "}

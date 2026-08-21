@@ -1,4 +1,5 @@
 import { CAR_COLORS } from "../../../constants/carConstants";
+import CustomInput from "../../CustomInput";
 export const CarDetailsStep = ({
   inputs,
   handleInputsChange,
@@ -10,32 +11,28 @@ export const CarDetailsStep = ({
     <div className="flex flex-col gap-3 p-4 border rounded-lg bg-white shadow-sm">
       <h3 className="text-lg font-semibold">Adım 5: Araç Detayları</h3>
       <form className="flex flex-col gap-2">
-        <input
-          className="bg-slate-100 border border-slate-300 rounded p-2 focus:ring-2 focus:ring-blue-400 outline-none"
+        <CustomInput
           type="text"
           placeholder="Plaka (Örn: 34ABC123)"
           name="licensePlate"
           value={inputs.licensePlate}
           onChange={handleInputsChange}
         />
-        <input
-          className="bg-slate-100 border border-slate-300 rounded p-2 focus:ring-2 focus:ring-blue-400 outline-none"
+        <CustomInput
           type="number"
           placeholder="Günlük Fiyat"
           name="dailyPrice"
           value={inputs.dailyPrice}
           onChange={handleInputsChange}
         />
-        <input
-          className="bg-slate-100 border border-slate-300 rounded p-2 focus:ring-2 focus:ring-blue-400 outline-none"
+        <CustomInput
           type="number"
           placeholder="Depozito Ücreti"
           name="deposit"
           value={inputs.deposit}
           onChange={handleInputsChange}
         />
-        <input
-          className="bg-slate-100 border border-slate-300 rounded p-2 focus:ring-2 focus:ring-blue-400 outline-none"
+        <CustomInput
           type="number"
           placeholder="Mevcut Kilometre"
           name="kilometer"
@@ -59,14 +56,14 @@ export const CarDetailsStep = ({
       <div className="flex gap-2 mt-2">
         <button
           onClick={onBack}
-          className="flex-1 bg-gray-500 text-white p-2 rounded"
+          className="flex-1 bg-gray-500 text-white p-2 rounded cursor-pointer"
         >
           Geri
         </button>
         <button
           onClick={onNext}
           disabled={!isFormValid}
-          className="flex-1 bg-blue-600 text-white p-2 rounded disabled:opacity-50"
+          className="flex-1 bg-blue-600 text-white p-2 rounded cursor-pointer disabled:cursor-default disabled:opacity-50"
         >
           İleri (Lokasyon)
         </button>

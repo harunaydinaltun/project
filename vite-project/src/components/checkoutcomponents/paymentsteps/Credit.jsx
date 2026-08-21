@@ -1,13 +1,7 @@
 import { useState } from "react";
 import { CustomInput } from "../../CustomInput";
-import {
-  validateTCNO,
-  validateName,
-  validatePhone,
-  validateCardNumber,
-  validateCardDate,
-  validateCardCvv,
-} from "../../../utils/checkoutvalidations";
+import { creditCardSchema } from "../../../validations/PaymentValidations";
+import cardValidator from "card-validator";
 
 export const Credit = ({
   customerInfo,
@@ -15,39 +9,40 @@ export const Credit = ({
   cardInfo,
   setCardInfo,
 }) => {
-  const [idError, setIdError] = useState("");
-  const [nameError, setNameError] = useState("");
-  const [surnameError, setSurnameError] = useState("");
-  const [phoneError, setPhoneError] = useState("");
+  const [errors, setErrors] = useState({});
 
-  const [cardError, setCardError] = useState("");
   const [cardBrand, setCardBrand] = useState("");
   const [isValid, setIsValid] = useState(false);
-
-  const [dateError, setDateError] = useState("");
-  const [cvvError, setCvvError] = useState("");
   const [cvvMaxLength, setCvvMaxLength] = useState(3);
+
+  const validateField = (schemaField, value) => {
+    const result = creditCardSchema.shape[schemaField].safeParse(value);
+    setErrors((prev) => ({
+      ...prev,
+      [schemaField]: result.success ? "" : result.error.issues[0].message,
+    }));
+  };
 
   const handleCustomerChange = (e) => {
     const { name, value } = e.target;
     setCustomerInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleIdBlur = (e) => setIdError(validateTCNO(e.target.value));
-  const handleNameBlur = (e) => setNameError(validateName(e.target.value));
-  const handleSurnameBlur = (e) =>
-    setSurnameError(validateName(e.target.value));
-  const handlePhoneBlur = (e) => setPhoneError(validatePhone(e.target.value));
+  const handleIdBlur = (e) => validateField("tcno", e.target.value);
+  const handleNameBlur = (e) => validateField("name", e.target.value);
+  const handleSurnameBlur = (e) => validateField("surname", e.target.value);
+  const handlePhoneBlur = (e) => validateField("phone", e.target.value);
 
   const handleCreditChange = (e) => {
     const val = e.target.value.replace(/[^0-9]/g, "");
     setCardInfo((prev) => ({ ...prev, cardNumber: val }));
 
-    const { isValid, brand, cvvMaxLength, error } = validateCardNumber(val);
-    setIsValid(isValid);
-    setCardBrand(brand);
-    setCvvMaxLength(cvvMaxLength);
-    setCardError(error);
+    const validation = cardValidator.number(val);
+    setIsValid(validation.isValid);
+    setCardBrand(validation.card ? validation.card.niceType : "");
+    setCvvMaxLength(validation.card ? validation.card.code.size : 3);
+
+    validateField("cardNumber", val);
   };
 
   const handleDateChange = (e) => {
@@ -55,17 +50,23 @@ export const Credit = ({
     if (val.length === 2 && !val.includes("/")) val = val + "/";
 
     setCardInfo((prev) => ({ ...prev, expireDate: val }));
-    setDateError(validateCardDate(val));
+    validateField("expireDate", val);
   };
 
   const handleCvvChange = (e) => {
     const val = e.target.value.replace(/[^0-9]/g, "");
     setCardInfo((prev) => ({ ...prev, cvv: val }));
-    setCvvError(validateCardCvv(val, cvvMaxLength));
+
+    if (val.length < cvvMaxLength) {
+      setErrors((prev) => ({ ...prev, cvv: "Geçersiz CVV" }));
+    } else {
+      setErrors((prev) => ({ ...prev, cvv: "" }));
+    }
   };
 
   const handleCardOwnerChange = (e) => {
     setCardInfo((prev) => ({ ...prev, cardOwner: e.target.value }));
+    validateField("cardOwner", e.target.value);
   };
 
   return (
@@ -83,7 +84,7 @@ export const Credit = ({
           value={customerInfo.tcno}
           onChange={handleCustomerChange}
           onBlur={handleIdBlur}
-          error={idError}
+          error={errors.tcno}
         />
 
         <div className="flex flex-col sm:flex-row gap-2">
@@ -93,7 +94,7 @@ export const Credit = ({
             value={customerInfo.name}
             onChange={handleCustomerChange}
             onBlur={handleNameBlur}
-            error={nameError}
+            error={errors.name}
           />
           <CustomInput
             label="Soyisim"
@@ -101,7 +102,7 @@ export const Credit = ({
             value={customerInfo.surname}
             onChange={handleCustomerChange}
             onBlur={handleSurnameBlur}
-            error={surnameError}
+            error={errors.surname}
           />
         </div>
         <CustomInput
@@ -112,7 +113,7 @@ export const Credit = ({
           placeholder="05..."
           maxLength="11"
           onBlur={handlePhoneBlur}
-          error={phoneError}
+          error={errors.phone}
         />
       </div>
 
@@ -127,7 +128,7 @@ export const Credit = ({
             name="creditno"
             value={cardInfo.cardNumber}
             onChange={handleCreditChange}
-            error={cardError}
+            error={errors.cardNumber}
           />
           {cardBrand && (
             <span
@@ -146,7 +147,7 @@ export const Credit = ({
             value={cardInfo.expireDate}
             onChange={handleDateChange}
             maxLength="5"
-            error={dateError}
+            error={errors.expireDate}
           />
           <CustomInput
             label="CVV"
@@ -154,7 +155,7 @@ export const Credit = ({
             value={cardInfo.cvv}
             onChange={handleCvvChange}
             maxLength={cvvMaxLength}
-            error={cvvError}
+            error={errors.cvv}
           />
         </div>
         <CustomInput
@@ -162,6 +163,7 @@ export const Credit = ({
           name="cardowner"
           value={cardInfo.cardOwner}
           onChange={handleCardOwnerChange}
+          error={errors.cardOwner}
         />
       </div>
     </div>

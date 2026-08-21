@@ -249,3 +249,39 @@ export const getCarCountByModelId = async (req, res) => {
     return res.status(500).json({ error: "Backend error" });
   }
 };
+
+export const getCarsByLocationId = async (req, res) => {
+  const { locationId } = req.query;
+
+  try {
+    const [data] = await db.query(
+      `
+    SELECT
+	    m.brand,
+	    m.modelName,
+	    m.year,
+	    c.licensePlate,
+	  (
+		  SELECT r.status 
+		  FROM rentals r 
+		  WHERE r.car_id = c.id 
+		  AND r.status IN ('active', 'confirmed')
+		  ORDER BY 
+		  CASE r.status 
+			  WHEN 'active' THEN 1 
+			  WHEN 'confirmed' THEN 2 
+		  END ASC
+		  LIMIT 1
+	  ) AS currentStatus
+	FROM cars c
+	LEFT JOIN models m ON m.id = c.modelId
+	WHERE c.locationId = ?
+	ORDER BY m.brand ASC;
+    `,
+      [locationId],
+    );
+    res.status(200).json({ data: data });
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+};

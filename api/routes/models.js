@@ -6,17 +6,19 @@ import {
   getDistinctBrands,
   getDistinctModelNames,
   getDistinctYears,
+  editModel,
 } from "../controllers/model.js";
-import { verifyAdmin } from "../middleware/verifyAdmin.js";
+import { verifyRole } from "../middleware/verifyRole.js";
 
 const router = express.Router();
 
 router.get("/", getAllModels);
-router.post("/", verifyAdmin, addModel);
+router.post("/", verifyRole(["admin"]), addModel);
+router.patch("/:id", verifyRole(["admin"]), editModel);
 
-router.get("/selection", verifyAdmin, getModelBySelection);
-router.get("/brands", verifyAdmin, getDistinctBrands);
-router.get("/model-names", verifyAdmin, getDistinctModelNames);
-router.get("/years", verifyAdmin, getDistinctYears);
+router.get("/selection", verifyRole(["admin"]), getModelBySelection);
+router.get("/brands", verifyRole(["admin"]), getDistinctBrands);
+router.get("/model-names", verifyRole(["admin"]), getDistinctModelNames);
+router.get("/years", verifyRole(["admin"]), getDistinctYears);
 
 export default router;

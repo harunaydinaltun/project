@@ -4,7 +4,9 @@ import { AuthContext } from "./AuthContext";
 
 export const AuthContextProvider = ({ children }) => {
   const checkInitialAuth = () => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    const userStr = localStorage.getItem("user");
+    const storedUser =
+      userStr && userStr !== "undefined" ? JSON.parse(userStr) : null;
     const token = localStorage.getItem("token");
 
     if (storedUser && token) {

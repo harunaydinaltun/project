@@ -40,7 +40,6 @@ export const CarCard = ({
       <span className="text-shadow-lg">
         {t.totalPrice}: {car.dailyPrice * totalDays}₺
       </span>
-      <span className="text-sm text-shadow-lg">{car.locationName} 🚩</span>
       <button
         onClick={handleViewDetails}
         className="bg-cyan-500 rounded-xl p-1 cursor-pointert text-slate-200 text-shadow-md focus:border-cyan-600 hover:bg-cyan-700 duration-300 cursor-pointer active:scale-[0.99]"

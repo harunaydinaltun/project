@@ -19,12 +19,13 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 import VerifyEmailPage from "./pages/VerifyEmailPage";
-import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminPanelPage from "./pages/AdminPanelPage";
-import { AdminRoute } from "./components/panelcomponents/AdminRoute";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import CheckoutPage from "./pages/CheckoutPage";
 import ProfileRentals from "./pages/ProfileRentals";
 import ProfileSettings from "./pages/ProfileSettings";
+import ManagerPanel from "./pages/ManagerPanel";
+import StaffLoginPage from "./pages/StaffLoginPage";
 
 const getSystemLanguage = () => {
   const browserLang = navigator.language || navigator.userLanguage || "";
@@ -107,17 +108,29 @@ export const AppContent = () => {
           element={<VerifyEmailPage t={t} />}
         />
         <Route
-          path="/adminlogin/"
+          path="/stafflogin/"
           element={
-            currentUser ? <Navigate to="/admin" /> : <AdminLoginPage t={t} />
+            currentUser ? (
+              <Navigate to={`/${currentUser.user_type}`} />
+            ) : (
+              <StaffLoginPage t={t} />
+            )
           }
         />
         <Route
           path="/admin/"
           element={
-            <AdminRoute>
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminPanelPage />
-            </AdminRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manager/"
+          element={
+            <ProtectedRoute allowedRoles={["manager"]}>
+              <ManagerPanel />
+            </ProtectedRoute>
           }
         />
       </Routes>

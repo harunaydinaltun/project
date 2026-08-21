@@ -3,68 +3,28 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import {
+  registerSchema,
+  adminRegisterSchema,
+  forgotPasswordSchema,
+  managerRegisterSchema,
+  resetPasswordSchema,
+  verifyEmailSchema,
+} from "../validations/AuthValidations.js";
+import { error } from "console";
 
 export const register = async (req, res) => {
-  const { password, tel_no, email, birthdate, name, surname } = req.body;
+  const validationResult = registerSchema.safeParse(req.body);
 
-  if (!password || !email || !birthdate || !name || !surname || !tel_no) {
-    return res.status(400).json({ error: "Please fill all fields." });
-  }
-
-  if (/[!-/]+/.test(name) || name.length > 45) {
+  if (!validationResult.success) {
     return res
       .status(400)
-      .json({ error: "Name field can not contain special chars." });
+      .json({ error: validationResult.error.issues[0].message });
   }
 
-  if (/[!-/]+/.test(surname) || surname.length > 45) {
-    return res
-      .status(400)
-      .json({ error: "Surname field can not contain special chars." });
-  }
+  const { password, tel_no, email, birthdate, name, surname } =
+    validationResult.data;
 
-  if (
-    password.length < 6 ||
-    !/[a-zçğıöşü]+/.test(password) ||
-    !/[A-ZÇĞİÖŞÜ]+/.test(password) ||
-    !/[0-9]+/.test(password) ||
-    !/[!-/]+/.test(password) ||
-    /\s/.test(password) ||
-    password.length > 64
-  ) {
-    return res.status(400).json({
-      error: "Your password don't match requirements",
-    });
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email) || email.length > 255) {
-    return res.status(400).json({
-      error: "Email is not valid",
-    });
-  }
-
-  if (tel_no.length !== 11 || !tel_no.startsWith("05")) {
-    return res.status(400).json({
-      error: "Tel no is not valid",
-    });
-  }
-
-  const birthDateObj = new Date(birthdate);
-  const today = new Date();
-  let age = today.getFullYear() - birthDateObj.getFullYear();
-  const monthDiff = today.getMonth() - birthDateObj.getMonth();
-
-  if (
-    monthDiff < 0 ||
-    (monthDiff === 0 && today.getDate() < birthDateObj.getDate())
-  ) {
-    age--;
-  }
-
-  if (age < 18) {
-    return res.status(400).json({ error: "You must be at least 18 years old" });
-  }
   const connection = await db.getConnection();
   try {
     const [existingUser] = await connection.query(
@@ -131,7 +91,7 @@ export const register = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Server error" });
   } finally {
-    connection.release;
+    connection.release();
   }
 };
 
@@ -164,9 +124,13 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
+    const token = jwt.sign(
+      { id: user.id, role: "customer" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "24h",
+      },
+    );
 
     const {
       password: userPassword,
@@ -190,11 +154,14 @@ export const logout = (req, res) => {
 };
 
 export const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+  const validationResult = forgotPasswordSchema.safeParse(req.body);
 
-  if (!email) {
-    return res.status(400).json({ error: "Please enter your email adress" });
+  if (!validationResult.success) {
+    return res.status(400).json({
+      error: validationResult.error.issues[0].message,
+    });
   }
+  const { email } = validationResult.data;
 
   try {
     const [users] = await db.query("SELECT * FROM users WHERE email = ?", [
@@ -248,25 +215,15 @@ export const forgotPassword = async (req, res) => {
 };
 
 export const resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
+  const validationResult = resetPasswordSchema.safeParse(req.body);
 
-  if (!token || !newPassword) {
-    return res.status(400).json({ error: "Eksik bilgi gönderildi" });
+  if (!validationResult.success) {
+    return res.status(400).json({
+      error: validationResult.error.issues[0].message,
+    });
   }
 
-  if (
-    newPassword.length < 6 ||
-    newPassword.length > 64 ||
-    !/[a-zçğıöşü]+/.test(newPassword) ||
-    !/[A-ZÇĞİÖŞÜ]+/.test(newPassword) ||
-    !/[0-9]+/.test(newPassword) ||
-    !/[!-/]+/.test(newPassword) ||
-    /\s/.test(newPassword)
-  ) {
-    return res
-      .status(400)
-      .json({ error: "Yeni şifreniz güvenlik gereksinimlerini karşılamıyor." });
-  }
+  const { token, newPassword } = validationResult.data;
 
   try {
     const [resets] = await db.query(
@@ -297,9 +254,15 @@ export const resetPassword = async (req, res) => {
 };
 
 export const verifyEmail = async (req, res) => {
-  const { token } = req.body;
+  const validationResult = verifyEmailSchema.safeParse(req.body);
 
-  if (!token) return res.status(400).json({ error: "Token bulunamadı." });
+  if (!validationResult.success) {
+    return res.status(400).json({
+      error: validationResult.error.issues[0].message,
+    });
+  }
+
+  const { token } = validationResult.data;
 
   try {
     const [users] = await db.query(
@@ -355,57 +318,18 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
-export const adminLogin = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const [admins] = await db.query(
-      "SELECT u.*, a.role FROM users u INNER JOIN admins a ON u.id = a.user_id WHERE u.email = ?",
-      [email],
-    );
-
-    if (admins.length === 0) {
-      return res.status(404).json({ error: "Admin not found!" });
-    }
-
-    const admin = admins[0];
-    const isPasswordValid = await bcrypt.compare(password, admin.password);
-
-    if (!isPasswordValid) {
-      return res.status(400).json({ error: "Wrong email or password" });
-    }
-
-    const token = jwt.sign(
-      { id: admin.id, role: admin.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "12h" },
-    );
-
-    const {
-      password: adminPassword,
-      verification_token,
-      ...otherDetails
-    } = admin;
-
-    res.status(200).json({
-      message: "Admin login succesful!",
-      token: token,
-      admin: otherDetails,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Backend error!" });
-  }
-};
-
 export const adminRegister = async (req, res) => {
-  const { email, password, name, surname, tel_no, birthdate } = req.body;
+  const validationResult = adminRegisterSchema.safeParse(req.body);
+
+  if (!validationResult.success) {
+    return res.status(400).json({
+      error: validationResult.error.issues[0].message,
+    });
+  }
+  const { email, password, name, surname, tel_no, birthdate } =
+    validationResult.data;
 
   const connection = await db.getConnection();
-
-  if (!email || !password || !name || !surname || !tel_no || !birthdate) {
-    return res.status(400).json({ error: "Please fill all required fields!" });
-  }
 
   try {
     const [existingAdmin] = await connection.query(
@@ -442,5 +366,113 @@ export const adminRegister = async (req, res) => {
     res.status(500).json({ error: "Backend error" });
   } finally {
     connection.release();
+  }
+};
+
+export const managerRegister = async (req, res) => {
+  const validationResult = managerRegisterSchema.safeParse(req.body);
+
+  if (!validationResult.success) {
+    return res.status(400).json({
+      error: validationResult.error.issues[0].message,
+    });
+  }
+  const {
+    email,
+    password,
+    name,
+    surname,
+    tel_no,
+    birthdate,
+    location_id,
+    hire_date,
+    department,
+  } = validationResult.data;
+
+  const connection = await db.getConnection();
+  try {
+    const [existingUser] = await connection.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email],
+    );
+
+    if (existingUser.length > 0) {
+      connection.release();
+      return res.status(400).json({ error: "E-mail adress is already taken!" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await connection.beginTransaction();
+
+    const [result] = await connection.query(
+      "INSERT INTO users (password, tel_no, email, birthdate, name, surname, user_type) VALUES (?,?,?,?,?,?,'manager')",
+      [hashedPassword, tel_no, email, birthdate, name, surname],
+    );
+
+    const userId = result.insertId;
+    await connection.query(
+      "INSERT INTO managers (user_id, location_id, hire_date, department) VALUES (?,?,?,?)",
+      [userId, location_id, hire_date, department],
+    );
+
+    await connection.commit();
+
+    res.status(201).json({ message: "User has been created succesfuly!" });
+  } catch (error) {
+    await connection.rollback();
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  } finally {
+    connection.release();
+  }
+};
+
+export const staffLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const [users] = await db.query(
+      `SELECT u.*, m.location_id
+      FROM users u
+      LEFT JOIN managers m ON u.id = m.user_id
+      WHERE u.email = ? AND u.user_type IN ('admin','manager')`,
+      [email],
+    );
+
+    if (users.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Yetkili bulunamadı veya yetkiniz yok!" });
+    }
+
+    const staff = users[0];
+    const isPasswordValid = await bcrypt.compare(password, staff.password);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Yanlış e-posta veya şifre" });
+    }
+
+    const token = jwt.sign(
+      { id: staff.id, role: staff.user_type },
+      process.env.JWT_SECRET,
+      { expiresIn: "12h" },
+    );
+
+    const {
+      password: staffPassword,
+      verification_token,
+      ...otherDetails
+    } = staff;
+    if (otherDetails.user_type === "admin") {
+      delete otherDetails.location_id;
+    }
+    res.status(200).json({
+      message: "Yetkili girişi başarılı!",
+      token: token,
+      user: otherDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Backend error!" });
   }
 };

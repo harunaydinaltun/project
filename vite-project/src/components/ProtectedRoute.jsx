@@ -1,28 +1,26 @@
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
-export const AdminRoute = ({ children }) => {
+export const ProtectedRoute = ({ children, allowedRoles }) => {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
-    if (!currentUser || currentUser.role !== "admin") {
+    if (!currentUser || !allowedRoles.includes(currentUser.user_type)) {
       const timer = setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 3000);
 
       return () => clearTimeout(timer);
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, allowedRoles]);
 
-  if (!currentUser || currentUser.role !== "admin") {
-    setTimeout(() => navigate("/login"), 3000);
-
+  if (!currentUser || !allowedRoles.includes(currentUser.user_type)) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center ">
         <span className="text-2xl text-shadow-2xl">
-          Yetkisiz erişim tespit edildi. Anasayfaya yönlendiriliyorsunuz...
+          Yetkisiz erişim tespit edildi. Giriş sayfasına yönlendiriliyorsunuz...
         </span>
       </div>
     );
