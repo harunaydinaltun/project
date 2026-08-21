@@ -4,10 +4,12 @@ export const CarSummary = ({ car }) => {
       <div className="flex flex-col p-2 justify-center items-center bg-slate-50 rounded-2xl ">
         <img
           src={
-            new URL(
-              `../../assets/placeholders/car-${car.color}.png`,
-              import.meta.url,
-            ).href
+            car.img
+              ? `http://localhost:8800${car.img}`
+              : new URL(
+                  `../../assets/placeholders/car-${car.color}.png`,
+                  import.meta.url,
+                ).href
           }
           alt={`${car.color} Car`}
           className="w-50 ring-1"

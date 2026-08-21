@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useCurrency } from "../../context/CurrencyContext";
 
 const PriceFilterBox = ({ t, maxPrice, onFilterChange }) => {
+  const { formatPrice } = useCurrency();
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -25,7 +27,7 @@ const PriceFilterBox = ({ t, maxPrice, onFilterChange }) => {
         <div className="overflow-hidden">
           <div className="pt-3 pb-1 px-1 flex flex-col gap-2">
             <span className="text-xs text-center font-bold text-blue-600">
-              {maxPrice} ₺
+              {formatPrice(maxPrice)}
             </span>
             <input
               type="range"

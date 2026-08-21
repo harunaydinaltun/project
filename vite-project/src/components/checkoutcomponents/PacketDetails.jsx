@@ -1,5 +1,7 @@
 import { RiStarSFill } from "react-icons/ri";
+import { useCurrency } from "../../context/CurrencyContext";
 export const PacketDetails = ({ packet, selected, onSelect }) => {
+  const { formatPrice } = useCurrency();
   return (
     <div
       className={`flex flex-col bg-slate-50 p-3 rounded-xl shadow-lg border-2 cursor-pointer xl:w-1/3 hover:shadow-xl duration-300 ${selected.id === packet.id ? `border-blue-500 scale-[1.02]` : `border-slate-300`} `}
@@ -18,7 +20,7 @@ export const PacketDetails = ({ packet, selected, onSelect }) => {
       </h1>
       <span className="self-center">
         <b>Günlük / </b>
-        {packet.price}₺
+        {formatPrice(packet.price)}
       </span>
       <span>{packet.details}</span>
       <ul className="bg-slate-200 shadow-md shadow-blue-100 rounded-md p-1.5 ring-1 ring-blue-100 mt-1.5">

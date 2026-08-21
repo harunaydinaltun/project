@@ -1,4 +1,5 @@
 import { useLocations } from "../../context/LocationContext";
+import { useCurrency } from "../../context/CurrencyContext";
 export const PaymentSummary = ({
   daysDiff,
   dailyPrice,
@@ -12,6 +13,7 @@ export const PaymentSummary = ({
   grandTotal,
 }) => {
   const { getLocationName } = useLocations();
+  const { formatPrice } = useCurrency();
   return (
     <div className="flex flex-col p-2 justify-center items-center bg-slate-50 rounded-2xl mt-2">
       <span className="text-2xl border-b">Payment Summary</span>
@@ -29,11 +31,11 @@ export const PaymentSummary = ({
           <b>Teslim Noktası: </b> {getLocationName(dropOffLocation)}{" "}
         </span>
         <span>
-          <b>Günlük Ücret: </b> {dailyPrice}
+          <b>Günlük Ücret: </b> {formatPrice(dailyPrice)}
         </span>
         <span>
           <b>Seçili Paket: </b> {selectedPacket.name}{" "}
-          {daysDiff * selectedPacket.price}₺
+          {formatPrice(daysDiff * selectedPacket.price)}
         </span>
         <span className="flex flex-col gap-1">
           <b>Extralar: </b>
@@ -43,8 +45,8 @@ export const PaymentSummary = ({
                 <li key={extra.id}>
                   - {extra.name} (
                   {extra.isDaily
-                    ? `${Number(extra.price)} ₺ / Günlük`
-                    : `${Number(extra.price)} ₺ / Tek seferlik`}
+                    ? `${formatPrice(Number(extra.price))}  / Günlük`
+                    : `${formatPrice(Number(extra.price))}  / Tek seferlik`}
                   )
                 </li>
               ))}
@@ -54,10 +56,10 @@ export const PaymentSummary = ({
           )}
         </span>
         <span>
-          <b>*TOPLAM: </b> {grandTotal}₺{" "}
+          <b>*TOPLAM: </b> {formatPrice(grandTotal)}{" "}
         </span>
         <span className="text-xs text-slate-500">
-          *{deposit}₺ Depozito Geri İade Edilir
+          *{formatPrice(deposit)} Depozito Geri İade Edilir
         </span>
       </div>
     </div>

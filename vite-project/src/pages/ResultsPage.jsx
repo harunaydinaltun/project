@@ -340,7 +340,7 @@ const ResultsPage = ({ t }) => {
                 Alış Tarihi
               </span>
               <span className="text-base font-semibold text-slate-700">
-                {activeStartDate}
+                {activeStartDate.replace("T", " ")}
               </span>
             </div>
 
@@ -351,7 +351,7 @@ const ResultsPage = ({ t }) => {
                 İade Tarihi
               </span>
               <span className="text-base font-semibold text-slate-700">
-                {activeEndDate}
+                {activeEndDate.replace("T", " ")}
               </span>
             </div>
           </div>

@@ -10,6 +10,8 @@ import packetRoutes from "./routes/packets.js";
 import extraRoutes from "./routes/extras.js";
 import paymentRoutes from "./routes/payments.js";
 import rentalRoutes from "./routes/rentals.js";
+import rateRoutes from "./routes/rates.js";
+import { fetchExchangeRates } from "./utils/exchangeRate.js";
 
 const app = express();
 
@@ -21,8 +23,6 @@ app.use(
 );
 
 app.use(express.json());
-
-app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/cars", carRoutes);
@@ -32,7 +32,10 @@ app.use("/api/packets", packetRoutes);
 app.use("/api/extras", extraRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/rentals", rentalRoutes);
+app.use("/api/rates", rateRoutes);
+app.use("/uploads", express.static("uploads"));
 
 app.listen(8800, () => {
   console.log("API WORKS");
+  fetchExchangeRates();
 });

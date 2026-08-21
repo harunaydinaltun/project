@@ -88,6 +88,31 @@ export const AdminEditModel = ({ model, count, onBack }) => {
     }
   };
 
+  const handleImageUpdate = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.patch(`/models/${model.id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert("Resim başarıyla güncellendi!");
+      setGlobalErr(null);
+    } catch (error) {
+      setGlobalErr(
+        error.response?.data?.error || "Resim güncellenirken bir hata oluştu.",
+      );
+    }
+  };
+
   const renderFieldRow = (label, name, type = "text", maxLength) => {
     const isEditing = editing[name];
 
@@ -181,6 +206,26 @@ export const AdminEditModel = ({ model, count, onBack }) => {
           {renderFieldRow("Kasa Tipi", "bodyType", "text", 45)}
           {renderFieldRow("Kapı Sayısı", "doors", "number")}
           {renderFieldRow("Minimum Yaş", "minAge", "number")}
+          <div className="flex items-center justify-between gap-4 w-full border-b border-slate-100 pb-6 mb-4">
+            <div className="flex flex-col grow max-w-sm">
+              <span className="text-xs text-slate-500 font-semibold mb-2">
+                Model Resmi
+              </span>
+              {model?.img && (
+                <img
+                  src={`http://localhost:8800${model.img}`}
+                  alt="Mevcut Model"
+                  className="w-32 h-24 object-cover rounded-lg border shadow-sm mb-3"
+                />
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpdate}
+                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer"
+              />
+            </div>
+          </div>
 
           {globalErr && (
             <p className="text-sm text-red-600 font-semibold mt-4">

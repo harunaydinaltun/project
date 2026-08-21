@@ -23,6 +23,8 @@ export const AdminAddModel = ({ setActiveTab }) => {
     minAge: "",
   });
 
+  const [image, setImage] = useState(null);
+
   const [showModelsModal, setShowModelModal] = useState(true);
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
@@ -46,6 +48,7 @@ export const AdminAddModel = ({ setActiveTab }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    console.log("Gönderilmeye Hazırlanan Resim:", image);
 
     const validationResult = addModelSchema.safeParse(inputs);
 
@@ -57,15 +60,28 @@ export const AdminAddModel = ({ setActiveTab }) => {
 
     const formatedInputs = validationResult.data;
 
+    const formData = new FormData();
+
+    Object.keys(formatedInputs).forEach((key) => {
+      formData.append(key, formatedInputs[key]);
+    });
+
+    if (image) {
+      formData.append("image", image);
+    }
+
     try {
       const token = localStorage.getItem("token");
-      const res = await api.post("/models", formatedInputs, {
+
+      const res = await api.post("/models", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
       setMessage(res.data.message);
       setError(null);
+
       setInputs({
         brand: "",
         modelName: "",
@@ -78,6 +94,7 @@ export const AdminAddModel = ({ setActiveTab }) => {
         doors: "",
         minAge: "",
       });
+      setImage(null);
     } catch (error) {
       setError(error.response?.data?.error || "bir hata oluştu");
       setMessage(null);
@@ -199,6 +216,16 @@ export const AdminAddModel = ({ setActiveTab }) => {
           required
           value={inputs.minAge}
         ></CustomInput>
+        <div className="flex flex-col gap-1 my-1">
+          <span className="text-center w-full border-b">Model Resmi Seç</span>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImage(e.target.files[0])}
+            disabled={isConfirming}
+            className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer disabled:opacity-50"
+          />
+        </div>
         {!isConfirming ? (
           <button
             className="w-full bg-blue-600 hover:bg-blue-700 text-white text-shadow-xs font-medium p-3 rounded-lg transition-all text-base mt-2 hover:cursor-pointer hover:scale-[0.99]"

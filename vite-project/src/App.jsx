@@ -43,6 +43,7 @@ export const AppContent = () => {
 
     return savedLang || getSystemLanguage();
   });
+
   useEffect(() => {
     localStorage.setItem("app_language", lang);
   }, [lang]);

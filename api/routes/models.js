@@ -1,4 +1,5 @@
 import express from "express";
+import { upload } from "../middleware/upload.js";
 import {
   getAllModels,
   addModel,
@@ -13,8 +14,8 @@ import { verifyRole } from "../middleware/verifyRole.js";
 const router = express.Router();
 
 router.get("/", getAllModels);
-router.post("/", verifyRole(["admin"]), addModel);
-router.patch("/:id", verifyRole(["admin"]), editModel);
+router.post("/", verifyRole(["admin"]), upload.single("image"), addModel);
+router.patch("/:id", verifyRole(["admin"]), upload.single("image"), editModel);
 
 router.get("/selection", verifyRole(["admin"]), getModelBySelection);
 router.get("/brands", verifyRole(["admin"]), getDistinctBrands);

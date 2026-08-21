@@ -9,8 +9,10 @@ import {
 } from "react-router-dom";
 import api from "../utils/api";
 import { useLocations } from "../context/LocationContext";
+import { useCurrency } from "../context/CurrencyContext";
 
 export const CarDetailsPage = () => {
+  const { formatPrice } = useCurrency();
   const { currentUser, logout } = useAuth();
   const { getLocationName, getLocationAddress } = useLocations();
   const { id } = useParams();
@@ -73,11 +75,12 @@ export const CarDetailsPage = () => {
         <img
           className="max-w-62.5 md:max-w-xs object-contain"
           src={
-            car.img ||
-            new URL(
-              `../assets/placeholders/car-${car.color}.png`,
-              import.meta.url,
-            ).href
+            car.img
+              ? `http://localhost:8800${car.img}`
+              : new URL(
+                  `../assets/placeholders/car-${car.color}.png`,
+                  import.meta.url,
+                ).href
           }
           alt={`${car.brand} ${car.modelName}`}
         />
@@ -164,16 +167,16 @@ export const CarDetailsPage = () => {
                   <b>Toplam Süre:</b> {daysDiff} Gün
                 </span>
                 <span className="font-bold text-lg text-blue-700 mt-2 border-t pt-2">
-                  Toplam Fiyat: {totalPrice.toFixed(2)}₺
+                  Toplam Fiyat: {formatPrice(totalPrice)}
                 </span>
               </div>
             )}
 
             <span>
-              <b>Günlük Fiyat:</b> {car.dailyPrice}₺
+              <b>Günlük Fiyat:</b> {formatPrice(car.dailyPrice)}
             </span>
             <span>
-              <b>Deposito:</b> {car.deposit}₺
+              <b>Deposito:</b> {formatPrice(car.deposit)}
             </span>
             <span>
               <b>Min. Yaş:</b> {car.minAge}

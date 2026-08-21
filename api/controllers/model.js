@@ -1,5 +1,8 @@
 import { db } from "../connect.js";
 import { addModelSchema } from "../validations/ModelValidations.js";
+import fs from "fs";
+import sharp from "sharp";
+import path from "path";
 
 export const getAllModels = async (req, res) => {
   let query = "SELECT * FROM models ORDER BY brand";
@@ -14,6 +17,8 @@ export const getAllModels = async (req, res) => {
 };
 
 export const addModel = async (req, res) => {
+  console.log("Gelen Body:", req.body);
+  console.log("Gelen Dosya (req.file):", req.file);
   const validationResult = addModelSchema.safeParse(req.body);
 
   if (!validationResult.success) {
@@ -35,6 +40,25 @@ export const addModel = async (req, res) => {
     minAge,
   } = validationResult.data;
 
+  let img_url = null;
+  if (req.file) {
+    const uploadPath = "uploads/";
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdir(uploadPath);
+    }
+    const filename = `car-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+    img_url = `/uploads/${filename}`;
+
+    await sharp(req.file.buffer)
+      .resize(400, 400, {
+        fit: "cover",
+        position: "center",
+      })
+      .toFormat("webp")
+      .webp({ quality: 80 })
+      .toFile(path.join(uploadPath, filename));
+  }
+
   try {
     const [existingModel] = await db.query(
       "SELECT * FROM models WHERE LOWER(brand) = LOWER(?) AND LOWER(modelName) = LOWER(?) AND year = ? AND LOWER(bodyType) = LOWER(?) AND LOWER(engineSize) = LOWER(?) AND LOWER(trim) = LOWER(?) AND LOWER(fuelType) = LOWER(?) AND LOWER(gearType) = LOWER(?)",
@@ -46,7 +70,7 @@ export const addModel = async (req, res) => {
     }
 
     const [result] = await db.query(
-      "INSERT INTO models (brand, modelName, year, engineSize, trim, fuelType, gearType, bodyType, doors, minAge) VALUES (?,?,?,?,?,?,?,?,?,?)",
+      "INSERT INTO models (brand, modelName, year, engineSize, trim, fuelType, gearType, bodyType, doors, minAge, img) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
       [
         brand,
         modelName,
@@ -58,6 +82,7 @@ export const addModel = async (req, res) => {
         bodyType,
         doors,
         minAge,
+        image_url,
       ],
     );
 
@@ -168,6 +193,39 @@ export const getDistinctYears = async (req, res) => {
 
 export const editModel = async (req, res) => {
   const { id } = req.params;
+
+  if (req.file) {
+    try {
+      const uploadPath = "uploads/";
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath);
+      }
+
+      const filename = `car-${Date.now()}-${Math.round(Math.random() * 1e9)}.webp`;
+      const image_url = `/uploads/${filename}`;
+
+      await sharp(req.file.buffer)
+        .resize(400, 400, {
+          fit: "cover",
+          position: "center",
+        })
+        .toFormat("webp")
+        .webp({ quality: 80 })
+        .toFile(path.join(uploadPath, filename));
+
+      await db.query("UPDATE models SET img = ? WHERE id = ?", [image_url, id]);
+
+      return res.status(200).json({
+        message: "Model resmi başarıyla güncellendi.",
+        img: image_url,
+      });
+    } catch (error) {
+      console.error("Resim işleme/güncelleme hatası:", error);
+      return res
+        .status(500)
+        .json({ error: "Resim yüklenirken bir hata oluştu." });
+    }
+  }
   const updateData = req.body;
 
   const keys = Object.keys(updateData);
