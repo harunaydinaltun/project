@@ -11,7 +11,6 @@ import {
   resetPasswordSchema,
   verifyEmailSchema,
 } from "../validations/AuthValidations.js";
-import { error } from "console";
 
 export const register = async (req, res) => {
   const validationResult = registerSchema.safeParse(req.body);
@@ -377,7 +376,7 @@ export const managerRegister = async (req, res) => {
       error: validationResult.error.issues[0].message,
     });
   }
-  const {
+  let {
     email,
     password,
     name,
@@ -399,6 +398,20 @@ export const managerRegister = async (req, res) => {
     if (existingUser.length > 0) {
       connection.release();
       return res.status(400).json({ error: "E-mail adress is already taken!" });
+    }
+
+    let responseMessage = "User has been created successfully!";
+
+    if (location_id) {
+      const [existingManager] = await connection.query(
+        "SELECT user_id FROM managers WHERE location_id = ?",
+        [location_id],
+      );
+      if (existingManager.length > 0) {
+        location_id = null;
+        responseMessage =
+          'User has been created, but the branch you have choosed has already a manager. If you want to change the manager of this branch please go to "Show Branches" tab ';
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

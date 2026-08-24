@@ -8,11 +8,19 @@ import { FaBuilding } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import api from "../../utils/api";
 import { CustomInput } from "../../components/CustomInput";
+import { useLocations } from "../../context/LocationContext";
 
 export const AdminEditLocInfo = ({ setActiveTab, selectedBranchId }) => {
+  const { getLocationName } = useLocations();
   const [loading, setLoading] = useState(false);
   const [locData, setLocData] = useState(null);
-  const [managers, setManagers] = useState([]); // Yeni: Müdürler listesi
+  const [managers, setManagers] = useState([]);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [pendingUpdate, setPendingUpdate] = useState({
+    name: "",
+    value: null,
+    managerDetails: null,
+  });
 
   const [inputs, setInputs] = useState({
     name: "",
@@ -87,9 +95,7 @@ export const AdminEditLocInfo = ({ setActiveTab, selectedBranchId }) => {
     setEditing((prev) => ({ ...prev, [name]: false }));
   };
 
-  const handleConfirm = async (name) => {
-    const validValue = inputs[name];
-
+  const executeUpdate = async (name, validValue) => {
     try {
       await api.patch(`/locations/editlocinfo?locId=${selectedBranchId}`, {
         [name]: validValue,
@@ -99,6 +105,7 @@ export const AdminEditLocInfo = ({ setActiveTab, selectedBranchId }) => {
       setEditing((prev) => ({ ...prev, [name]: false }));
       setErrors((prev) => ({ ...prev, [name]: "" }));
       setGlobalErr(null);
+      setConfirmModal(false);
     } catch (error) {
       const errorMsg =
         error.response?.data?.error || "Güncelleme sırasında bir hata oluştu.";
@@ -106,7 +113,31 @@ export const AdminEditLocInfo = ({ setActiveTab, selectedBranchId }) => {
         ...prev,
         [name]: errorMsg,
       }));
+      setConfirmModal(false);
     }
+  };
+
+  const handleConfirm = async (name) => {
+    const validValue = inputs[name];
+
+    if (name === "branch_manager_id" && validValue !== "") {
+      const selectedManager = managers.find((m) => m.id === validValue);
+
+      if (
+        selectedManager?.location_id &&
+        selectedManager.location_id !== Number(selectedBranchId)
+      ) {
+        setPendingUpdate({
+          name,
+          value: validValue,
+          managerDetails: selectedManager,
+        });
+        setConfirmModal(true);
+        return;
+      }
+    }
+
+    await executeUpdate(name, validValue);
   };
 
   const renderFieldRow = (
@@ -149,7 +180,10 @@ export const AdminEditLocInfo = ({ setActiveTab, selectedBranchId }) => {
                   <option value="">Seçiniz</option>
                   {options.map((opt) => (
                     <option key={opt.id} value={opt.id}>
-                      {opt.name} {opt.surname}
+                      {opt.name} {opt.surname}{" "}
+                      {opt.location_id
+                        ? `| Şubeye Kayıtlı: ${getLocationName(opt.location_id)} `
+                        : `| MÜSAİT`}
                     </option>
                   ))}
                 </select>
@@ -248,6 +282,57 @@ export const AdminEditLocInfo = ({ setActiveTab, selectedBranchId }) => {
           )}
         </div>
       </div>
+      {confirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/20 animate-fade-in">
+          <div className="flex flex-col bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 text-center border border-slate-100">
+            <div className="w-16 h-16 bg-yellow-100 text-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">
+              !
+            </div>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">
+              Emin misiniz?
+            </h3>
+            <p className="text-slate-600 text-sm mb-6 leading-relaxed">
+              Seçtiğiniz yönetici (
+              <strong>
+                {pendingUpdate.managerDetails?.name}{" "}
+                {pendingUpdate.managerDetails?.surname}
+              </strong>
+              ) şu anda halihazırda{" "}
+              <strong>
+                {getLocationName(pendingUpdate.managerDetails?.location_id)} ID:{" "}
+                {pendingUpdate.managerDetails?.location_id}
+              </strong>{" "}
+              numaralı şubede görev yapmaktadır. <br />
+              <br />
+              Onaylarsanız, yöneticinin eski şubesiyle olan bağı kopartılacak ve
+              bu şubeye atanacaktır.
+            </p>
+            <div className="flex justify-evenly gap-3">
+              <button
+                className="flex-1 bg-slate-100 text-slate-700 font-semibold border border-slate-200 hover:bg-slate-200 p-3 rounded-2xl active:scale-[0.98] transition-all cursor-pointer"
+                onClick={() => {
+                  setConfirmModal(false);
+                  setPendingUpdate({
+                    name: "",
+                    value: null,
+                    managerDetails: null,
+                  });
+                }}
+              >
+                İptal Et
+              </button>
+              <button
+                className="flex-1 bg-blue-600 text-white font-semibold ring ring-blue-200 shadow-md hover:bg-blue-700 p-3 rounded-2xl active:scale-[0.98] transition-all cursor-pointer"
+                onClick={() =>
+                  executeUpdate(pendingUpdate.name, pendingUpdate.value)
+                }
+              >
+                Yine de Ata
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

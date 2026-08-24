@@ -1,12 +1,12 @@
 import express from "express";
 import {
   cancelRental,
-  getRentalsById,
   setRentalActive,
   showConfirmedRentalsByLocId,
   showActiveRentalsByLocId,
   setRentalCompleted,
   showAllRentalsByLocId,
+  getRentalsByUserId,
 } from "../controllers/rental.js";
 import { verifyRole } from "../middleware/verifyRole.js";
 
@@ -15,7 +15,7 @@ const router = express.Router();
 router.get(
   "/getById",
   verifyRole(["admin", "manager", "customer"]),
-  getRentalsById,
+  getRentalsByUserId,
 );
 router.patch(
   "/cancelById",

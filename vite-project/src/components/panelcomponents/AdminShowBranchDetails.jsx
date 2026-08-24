@@ -3,7 +3,11 @@ import api from "../../utils/api";
 import { IoReturnUpBackOutline } from "react-icons/io5";
 import { useLocations } from "../../context/LocationContext";
 
-export const AdminShowBranchDetails = ({ selectedBranchId, setActiveTab }) => {
+export const AdminShowBranchDetails = ({
+  selectedBranchId,
+  setActiveTab,
+  activeTab,
+}) => {
   const [loading, setLoading] = useState(false);
   const [fleetData, setFleetData] = useState([]);
   const { getLocationName } = useLocations();
@@ -56,13 +60,15 @@ export const AdminShowBranchDetails = ({ selectedBranchId, setActiveTab }) => {
   return (
     <div className="p-4 md:p-6 w-full max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={() => setActiveTab("branches")}
-          className="flex px-4 py-2 gap-0.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium cursor-pointer duration-200"
-        >
-          <IoReturnUpBackOutline className="mt-0.5 mr-0.5" />
-          Geri Dön
-        </button>
+        {activeTab === "showbranchdetails" && (
+          <button
+            onClick={() => setActiveTab("branches")}
+            className="flex px-4 py-2 gap-0.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium cursor-pointer duration-200"
+          >
+            <IoReturnUpBackOutline className="mt-0.5 mr-0.5" />
+            Geri Dön
+          </button>
+        )}
         <h2 className="lg:text-2xl md:text-sm font-semibold text-slate-800">
           Şube Filo Detayları ({getLocationName(selectedBranchId)})
         </h2>

@@ -27,6 +27,15 @@ export const AdminPanelSidebar = ({ setActiveTab }) => {
           >
             Şube Yöneticisi Ekle
           </button>
+
+          <button
+            type="button"
+            className="w-full text-left px-4 py-3 rounded-lg text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900 active:scale-[0.99] transition-all duration-150 cursor-pointer"
+            onClick={() => setActiveTab("addloc")}
+          >
+            Yeni Şube Ekle
+          </button>
+
           <button
             type="button"
             className="w-full text-left px-4 py-3 rounded-lg text-slate-700 font-medium hover:bg-slate-100 hover:text-slate-900 active:scale-[0.99] transition-all duration-150 cursor-pointer"

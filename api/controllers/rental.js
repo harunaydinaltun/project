@@ -1,6 +1,6 @@
 import { db } from "../connect.js";
 
-export const getRentalsById = async (req, res) => {
+export const getRentalsByUserId = async (req, res) => {
   const user_id = req.user?.id;
 
   const query = `SELECT 
@@ -74,12 +74,19 @@ export const cancelRental = async (req, res) => {
 };
 
 export const showConfirmedRentalsByLocId = async (req, res) => {
-  const { locId } = req.query;
+  const { locId, rentalId } = req.query;
   if (!locId) {
     return res.status(400).json({ message: "Lokasyon ID'si gerekli!" });
   }
 
   try {
+    let whereClause = "r.pickup_location_id = ? AND r.status = 'confirmed' ";
+    const queryParams = [locId];
+    if (rentalId) {
+      whereClause += "AND r.id = ?";
+      queryParams.push(rentalId);
+    }
+
     const query = `
       SELECT 
         r.id,
@@ -105,7 +112,7 @@ export const showConfirmedRentalsByLocId = async (req, res) => {
       LEFT JOIN rentals_extra re ON r.id = re.rental_id
       LEFT JOIN extras e ON re.extra_id = e.id
       LEFT JOIN users u ON r.user_id = u.id
-      WHERE r.pickup_location_id = ? AND r.status = 'confirmed'
+      WHERE ${whereClause}
       GROUP BY 
         r.id, 
         r.start_date, 
@@ -123,7 +130,7 @@ export const showConfirmedRentalsByLocId = async (req, res) => {
         pk.name
       ORDER BY r.start_date DESC
     `;
-    const [data] = await db.query(query, [locId]);
+    const [data] = await db.query(query, queryParams);
     return res.status(200).json({ data: data });
   } catch (error) {
     return res.status(500).json({ message: "Backend error" });
@@ -153,12 +160,20 @@ export const setRentalActive = async (req, res) => {
 };
 
 export const showActiveRentalsByLocId = async (req, res) => {
-  const { locId } = req.query;
+  const { locId, rentalId } = req.query;
   if (!locId) {
     return res.status(400).json({ message: "Lokasyon ID'si gerekli!" });
   }
 
   try {
+    let whereClause = "r.return_location_id = ? AND r.status = 'active' ";
+    const queryParams = [locId];
+
+    if (rentalId) {
+      whereClause += "AND r.id = ?";
+      queryParams.push(rentalId);
+    }
+
     const query = `
       SELECT 
         r.id,
@@ -184,7 +199,7 @@ export const showActiveRentalsByLocId = async (req, res) => {
       LEFT JOIN rentals_extra re ON r.id = re.rental_id
       LEFT JOIN extras e ON re.extra_id = e.id
       LEFT JOIN users u ON r.user_id = u.id
-      WHERE r.return_location_id = ? AND r.status = 'active'
+      WHERE ${whereClause}
       GROUP BY 
         r.id, 
         r.start_date, 
@@ -202,7 +217,7 @@ export const showActiveRentalsByLocId = async (req, res) => {
         pk.name
       ORDER BY r.start_date DESC
     `;
-    const [data] = await db.query(query, [locId]);
+    const [data] = await db.query(query, queryParams);
     return res.status(200).json({ data: data });
   } catch (error) {
     return res.status(500).json({ message: "Backend error" });
@@ -258,12 +273,20 @@ export const setRentalCompleted = async (req, res) => {
 };
 
 export const showAllRentalsByLocId = async (req, res) => {
-  const { locId } = req.query;
+  const { locId, rentalId } = req.query;
   if (!locId) {
-    return res.status(400).json({ message: "Lokasyon ID'si gerekli!" });
+    return res.status(400).json({ message: "Eksik bilgi!" });
   }
 
   try {
+    let whereClause = "(r.pickup_location_id = ? OR r.return_location_id = ?) ";
+    const queryParams = [locId, locId];
+
+    if (rentalId) {
+      whereClause += "AND r.id = ?";
+      queryParams.push(rentalId);
+    }
+
     const query = `
       SELECT 
         r.id,
@@ -289,7 +312,7 @@ export const showAllRentalsByLocId = async (req, res) => {
       LEFT JOIN rentals_extra re ON r.id = re.rental_id
       LEFT JOIN extras e ON re.extra_id = e.id
       LEFT JOIN users u ON r.user_id = u.id
-      WHERE r.pickup_location_id = ? OR r.return_location_id = ?
+      WHERE ${whereClause}
       GROUP BY 
         r.id, 
         r.start_date, 
@@ -307,7 +330,7 @@ export const showAllRentalsByLocId = async (req, res) => {
         pk.name
       ORDER BY r.start_date DESC
     `;
-    const [data] = await db.query(query, [locId, locId]);
+    const [data] = await db.query(query, queryParams);
     return res.status(200).json({ data: data });
   } catch (error) {
     return res.status(500).json({ message: "Backend error" });

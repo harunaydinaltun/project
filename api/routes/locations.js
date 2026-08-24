@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addLocation,
   editLocationInfo,
   getAllLocations,
   getAllLocationsAdmin,
@@ -19,4 +20,5 @@ router.get(
 router.get("/getlocinfo", verifyRole(["admin"]), getLocInfo);
 router.patch("/editlocinfo", verifyRole(["admin"]), editLocationInfo);
 router.get("/managers", verifyRole(["admin"]), getManagers);
+router.post("/addloc", verifyRole(["admin"]), addLocation);
 export default router;

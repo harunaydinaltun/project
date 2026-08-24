@@ -11,6 +11,7 @@ import AdminAddManager from "../components/panelcomponents/AdminAddManager";
 import AdminShowBranches from "../components/panelcomponents/AdminShowBranches";
 import AdminShowBranchDetails from "../components/panelcomponents/AdminShowBranchDetails";
 import AdminEditLocInfo from "../components/panelcomponents/AdminEditLocInfo";
+import AdminAddLocation from "../components/panelcomponents/AdminAddLocation";
 
 export const AdminPanelPage = () => {
   const { currentUser } = useAuth();
@@ -60,6 +61,9 @@ export const AdminPanelPage = () => {
           </div>
         )}
         {activeTab === "addmanager" && <AdminAddManager />}
+        {activeTab === "addloc" && (
+          <AdminAddLocation setActiveTab={setActiveTab} />
+        )}
         {activeTab === "branches" && (
           <AdminShowBranches
             setActiveTab={setActiveTab}
@@ -84,6 +88,7 @@ export const AdminPanelPage = () => {
           <AdminShowBranchDetails
             selectedBranchId={selectedBranchId}
             setActiveTab={setActiveTab}
+            activeTab={activeTab}
           />
         )}
         {activeTab === "editlocinfo" && (

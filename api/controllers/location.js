@@ -20,11 +20,13 @@ export const getAllLocationsAdmin = async (req, res) => {
         l.id AS locationId, 
         l.name AS locationName, 
         l.full_address as fullAddress, 
-        l.city, l.branch_manager_id as managerId, 
+        l.city, 
+        m.user_id as managerId, 
         u.name as managerName, 
         u.surname as managerSurname 
       FROM locations l
-      LEFT JOIN users u ON l.branch_manager_id = u.id`);
+      LEFT JOIN managers m ON l.id = m.location_id
+      LEFT JOIN users u ON m.user_id = u.id`);
     res.status(200).json({ success: true, data: data });
   } catch (error) {
     res.status(500).json({ error: "Server Error" });
@@ -38,7 +40,12 @@ export const getLocInfo = async (req, res) => {
     return res.status(400).json({ message: "Location ID is required!" });
   }
 
-  const query = "SELECT * FROM locations WHERE id = ?";
+  const query = `
+    SELECT l.*, m.user_id as branch_manager_id 
+    FROM locations l 
+    LEFT JOIN managers m ON l.id = m.location_id 
+    WHERE l.id = ?
+  `;
 
   try {
     const [response] = await db.query(query, [locId]);
@@ -63,7 +70,39 @@ export const editLocationInfo = async (req, res) => {
   const fieldToUpdate = keys[0];
   const newValue = updateData[fieldToUpdate];
 
-  const allowedFields = ["name", "full_address", "city", "branch_manager_id"];
+  if (fieldToUpdate === "branch_manager_id") {
+    const connection = await db.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      await connection.query(
+        "UPDATE managers SET location_id = NULL WHERE location_id = ?",
+        [locId],
+      );
+
+      if (newValue !== "" && newValue !== null) {
+        await connection.query(
+          "UPDATE managers SET location_id = ? WHERE user_id = ?",
+          [locId, newValue],
+        );
+      }
+
+      await connection.commit();
+      return res
+        .status(200)
+        .json({ message: "Şube müdürü başarıyla güncellendi." });
+    } catch (error) {
+      await connection.rollback();
+      console.error("Yönetici atama hatası:", error);
+      return res
+        .status(500)
+        .json({ error: "Müdür güncellenirken hata oluştu." });
+    } finally {
+      connection.release();
+    }
+  }
+
+  const allowedFields = ["name", "full_address", "city"];
 
   if (!allowedFields.includes(fieldToUpdate)) {
     return res
@@ -96,8 +135,12 @@ export const editLocationInfo = async (req, res) => {
 
 export const getManagers = async (req, res) => {
   try {
-    const query =
-      "SELECT id, name, surname FROM users WHERE user_type = 'manager'";
+    const query = `
+      SELECT u.id, u.name, u.surname, m.location_id 
+      FROM users u 
+      INNER JOIN managers m ON u.id = m.user_id 
+      WHERE u.user_type = 'manager'
+    `;
 
     const [managers] = await db.query(query);
 
@@ -108,5 +151,26 @@ export const getManagers = async (req, res) => {
   } catch (error) {
     console.error("Müdürleri çekerken hata oluştu:", error);
     res.status(500).json({ error: "Sunucu tarafında bir hata oluştu." });
+  }
+};
+
+export const addLocation = async (req, res) => {
+  const { name, city, full_address } = req.body;
+
+  if (!name || !city || !full_address) {
+    return res
+      .status(400)
+      .json({ error: "Lütfen tüm alanları eksiksiz doldurun." });
+  }
+
+  try {
+    const query =
+      "INSERT INTO locations (name, city, full_address) VALUES (?, ?, ?)";
+    await db.query(query, [name, city, full_address]);
+
+    return res.status(201).json({ message: "Yeni şube başarıyla eklendi." });
+  } catch (error) {
+    console.error("Şube ekleme hatası:", error);
+    return res.status(500).json({ error: "Sunucu tarafında bir hata oluştu." });
   }
 };

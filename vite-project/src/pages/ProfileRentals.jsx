@@ -20,7 +20,6 @@ export const ProfileRentals = () => {
     api
       .get("/rentals/getById")
       .then((res) => {
-        console.log(res.data.data);
         setConfirmedRentals(
           res.data.data.filter((r) => r.status === "confirmed"),
         );

@@ -87,7 +87,7 @@ export const Navbar = ({ t, setLang, lang }) => {
               currentUser.user_type === "manager") && (
               <button
                 type="button"
-                className="text-white/90 hover:text-white font-medium px-3 py-1.5 text-sm transition-all active:scale-95 cursor-pointer"
+                className="text-white/90 hover:text-white font-medium px-4 py-1.5 rounded-full  transition-all active:scale-95 cursor-pointer border border-white/20"
                 onClick={() => navigate(`/${currentUser.user_type}`)}
               >
                 PANEL
@@ -104,7 +104,7 @@ export const Navbar = ({ t, setLang, lang }) => {
 
             <button
               type="button"
-              className="bg-red-500/80 hover:bg-white/50 text-white font-medium px-4 py-1.5 rounded-full t transition-all active:scale-95 cursor-pointer border border-white/20"
+              className="bg-red-500/80 hover:bg-red-400/80 text-white font-medium px-4 py-1.5 rounded-full t transition-all active:scale-95 cursor-pointer border border-white/20"
               onClick={() => setIsPopUpOpen(true)}
             >
               {t.logout}

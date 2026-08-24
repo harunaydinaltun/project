@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
 import api from "../../utils/api";
 import { useLocations } from "../../context/LocationContext";
+import { useCurrency } from "../../context/CurrencyContext";
 
 export const ManagerShowAllRentals = ({ locId }) => {
+  const { formatPrice } = useCurrency();
   const { getLocationName } = useLocations();
   const [loading, setLoading] = useState(false);
   const [rentals, setRentals] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/rentals/getAllByLocId?locId=${locId}`);
+        const url =
+          appliedSearch !== ""
+            ? `/rentals/getAllByLocId?locId=${locId}&rentalId=${appliedSearch}`
+            : `/rentals/getAllByLocId?locId=${locId}`;
+
+        const res = await api.get(url);
         setRentals(res.data.data);
       } catch (error) {
         console.log(error);
@@ -20,7 +29,17 @@ export const ManagerShowAllRentals = ({ locId }) => {
       }
     };
     fetchData();
-  }, [locId]);
+  }, [locId, appliedSearch]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setAppliedSearch(searchInput);
+  };
+
+  const clearSearch = () => {
+    setSearchInput("");
+    setAppliedSearch("");
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -61,6 +80,35 @@ export const ManagerShowAllRentals = ({ locId }) => {
 
   return (
     <div className="flex flex-col mt-3">
+      <form
+        onSubmit={handleSearch}
+        className="flex flex-col sm:flex-row gap-3 mb-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm"
+      >
+        <input
+          type="text"
+          placeholder="Rezervasyon ID ile ara..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className="flex-1 px-4 py-2 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400"
+        />
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            className="px-6 py-2 bg-indigo-500 text-white font-semibold rounded-xl hover:bg-indigo-600 transition-colors shadow-sm active:scale-[0.99]"
+          >
+            Ara
+          </button>
+          {appliedSearch !== "" && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="px-4 py-2 bg-slate-100 text-slate-600 font-semibold rounded-xl hover:bg-slate-200 transition-colors active:scale-[0.99]"
+            >
+              Temizle
+            </button>
+          )}
+        </div>
+      </form>
       {rentals && rentals.length > 0 ? (
         rentals.map((rental) => (
           <div
@@ -71,7 +119,6 @@ export const ManagerShowAllRentals = ({ locId }) => {
               <span className="text-xl font-bold text-slate-800">
                 Rezervasyon ID: {rental.id}{" "}
               </span>
-              {/* Dinamik Durum Rozeti */}
               {getStatusBadge(rental.status)}
             </div>
 
@@ -116,7 +163,7 @@ export const ManagerShowAllRentals = ({ locId }) => {
 
             <div className="flex justify-end mt-1 border-t border-slate-200 pt-3">
               <span className="text-lg font-bold text-slate-600 bg-slate-100 px-4 py-2 rounded-lg border border-slate-200">
-                Toplam Tutar: {rental.totalPrice} ₺
+                Toplam Tutar: {formatPrice(rental.totalPrice)}
               </span>
             </div>
           </div>
