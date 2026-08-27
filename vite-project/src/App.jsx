@@ -12,7 +12,6 @@ import { useAuth } from "./context/AuthContext";
 import ResultsPage from "./pages/ResultsPage";
 import CarDetailsPage from "./pages/CarDetailsPage";
 import RegisterPage from "./pages/RegisterPage";
-import Test from "./pages/Test";
 import { Navbar } from "./components/Navbar";
 import { LoginPage } from "./pages/LoginPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -60,7 +59,6 @@ export const AppContent = () => {
           path="/"
           element={<Home t={t} setLang={setLang} lang={lang} />}
         />
-        <Route path="/test" element={<Test t={t} />} />
         <Route
           path="/profile"
           element={

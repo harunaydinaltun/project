@@ -82,7 +82,7 @@ export const addModel = async (req, res) => {
         bodyType,
         doors,
         minAge,
-        image_url,
+        img_url,
       ],
     );
 
